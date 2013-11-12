@@ -4,3 +4,11 @@
 *.jar
 *.war
 *.ear
+/bin
+
+
+# Maven Files #
+/target
+
+# Eclipse Files #
+/.settings
