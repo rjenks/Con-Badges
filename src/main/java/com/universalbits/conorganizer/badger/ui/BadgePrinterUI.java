@@ -1,6 +1,9 @@
 package com.universalbits.conorganizer.badger.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -84,6 +87,17 @@ public class BadgePrinterUI {
 			tabbedPane = new JTabbedPane();
 
 			pendingList = new JList<BadgeInfo>(pendingListModel);
+			pendingList.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mousePressed(MouseEvent e) {
+					if (e.getClickCount() == 2) {
+						final BadgeInfo badgeInfo = pendingList.getSelectedValue();
+						if (badgeInfo != null) {
+							new BadgeDialog(frame, badgeInfo).setVisible(true);
+						}
+					}
+				}
+			});
 			final JScrollPane pendingScroll = new JScrollPane(pendingList);
 			problemList = new JList<BadgeInfo>(problemListModel);
 			final JScrollPane problemScroll = new JScrollPane(problemList);
