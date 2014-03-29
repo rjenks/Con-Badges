@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="369"
+   height="549"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="attendee.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient5340">
+      <stop
+         style="stop-color:#930088;stop-opacity:1;"
+         offset="0"
+         id="stop5342" />
+      <stop
+         id="stop5350"
+         offset="0.5"
+         style="stop-color:#c90044;stop-opacity:1;" />
+      <stop
+         style="stop-color:#930088;stop-opacity:1;"
+         offset="1"
+         id="stop5344" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5340"
+       id="linearGradient5348"
+       x1="185.90498"
+       y1="994.27588"
+       x2="185.90498"
+       y2="1062.656"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       id="filter3002"
+       inkscape:label="Cool outside"
+       inkscape:menu="Morphology"
+       inkscape:menu-tooltip="Blurred colorized contour, empty inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3004"
+         stdDeviation="2"
+         result="result1" />
+      <feOffset
+         id="feOffset3006"
+         dx="2"
+         dy="2" />
+      <feConvolveMatrix
+         id="feConvolveMatrix3008"
+         result="result3"
+         order="3 3"
+         kernelMatrix="2 0 0 0 8 0 4 0 -4 "
+         divisor="2"
+         bias="0"
+         targetX="0" />
+      <feComposite
+         id="feComposite3010"
+         in2="result1"
+         operator="xor"
+         result="result2"
+         in="result3" />
+      <feColorMatrix
+         id="feColorMatrix3012"
+         values="91.7"
+         result="fbSourceGraphic"
+         type="hueRotate" />
+      <feBlend
+         id="feBlend3014"
+         in2="result3"
+         mode="multiply"
+         result="result4"
+         in="fbSourceGraphic" />
+      <feComposite
+         id="feComposite3016"
+         in2="result4"
+         operator="in"
+         result="result6"
+         in="fbSourceGraphic" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.88656698"
+     inkscape:cx="68.380147"
+     inkscape:cy="293.30732"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     guidetolerance="29"
+     objecttolerance="10000"
+     inkscape:window-width="1394"
+     inkscape:window-height="856"
+     inkscape:window-x="46"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       orientation="1,0"
+       position="185.90498,403.15441"
+       id="guide5698" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-503.3598)">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="rect3018"
+       width="369"
+       height="549"
+       x="-1.1279464"
+       y="503.61566" />
+    <image
+       y="503.07355"
+       x="-1.6026783"
+       id="PICTURE"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAAA3NCSVQICAjb4U/gAAAA60lEQVR4
+nO3QQQ3AIADAQMDaNOATibOwvsiSOwVN53P24Jt1O+BPzArMCswKzArMCswKzArMCswKzArMCswK
+zArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArM
+CswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswK
+zArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArM
+Cl4R7QIQ6uXfDwAAAABJRU5ErkJggg==
+"
+       height="400"
+       width="370"
+       inkscape:label="#image3096" />
+    <rect
+       style="fill:url(#linearGradient5348);fill-opacity:1;stroke:none"
+       id="rect3128"
+       width="368.49072"
+       height="52.572998"
+       x="0.097580858"
+       y="1000.6486" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;text-align:end;line-height:89.99999762%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter3002);font-family:Sans"
+       x="348.03342"
+       y="558.45239"
+       id="text3066"
+       sodipodi:linespacing="89.999998%"><tspan
+         sodipodi:role="line"
+         id="tspan3068"
+         x="348.03342"
+         y="558.45239">CoolGenreCon</tspan><tspan
+         sodipodi:role="line"
+         x="348.03342"
+         y="594.45239"
+         id="tspan3074"
+         style="font-style:italic;font-weight:bold;line-height:89.99999762%;fill:#000000;-inkscape-font-specification:Sans Bold Italic">2032</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="127.2059"
+       y="923.70038"
+       id="BADGE_NAME"
+       sodipodi:linespacing="125%"
+       inkscape:label="#text3098"><tspan
+         sodipodi:role="line"
+         id="tspan3100"
+         x="127.2059"
+         y="923.70038"
+         style="font-size:24px">Joe Congoer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffc9;fill-opacity:1;stroke:none;font-family:Sans"
+       x="186.98146"
+       y="1041.5795"
+       id="TYPE_LABEL"
+       sodipodi:linespacing="125%"
+       inkscape:label="#text3124"><tspan
+         sodipodi:role="line"
+         id="tspan3126"
+         x="186.98146"
+         y="1041.5795"
+         style="font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold">Attendee</tspan></text>
+    <image
+       y="964.95209"
+       x="72.135239"
+       id="BARCODE"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAAA3NCSVQICAjb4U/gAAAA6UlEQVR4 nO3QQQ3AIADAQMAevtGFhfVFltwpaDr3PoNv1uuAPzErMCswKzArMCswKzArMCswKzArMCswKzAr MCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCsw KzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzAr MCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCswKzArMCu4 QXMCJFH2TE4AAAAASUVORK5CYII= "
+       height="25"
+       width="225"
+       inkscape:label="#image5695" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="125.37778"
+       y="947.03296"
+       id="ORGANIZATION"
+       sodipodi:linespacing="125%"
+       inkscape:label="#text5731"><tspan
+         sodipodi:role="line"
+         id="tspan5733"
+         x="125.37778"
+         y="947.03296"
+         style="font-size:24px;font-weight:bold;-inkscape-font-specification:Sans Bold">Big Fandom Club</tspan></text>
+    <image
+       y="853.52679"
+       x="22.254803"
+       id="QRCODE"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAAA3NCSVQICAjb4U/gAAAA60lEQVR4 nO3QQQ3AIADAQMAT/sVgBAvriyy5U9B0nr0H36zXAX9iVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZg VmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBW YFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZg VmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBW cAFepQIV59eqoQAAAABJRU5ErkJggg== "
+       height="100"
+       width="100"
+       inkscape:label="#image5617" />
+  </g>
+</svg>

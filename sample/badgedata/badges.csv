@@ -1,0 +1,5 @@
+ID_USER,ID_BADGE,TYPE,BADGE_NAME,ORGANIZATION,BARCODE,QRCODE
+10000,1000,attendee,Rose,Bad Wolf Club,10000-1000,http://rjenks.github.io/Badger
+10001,1001,pre-registered,Marty,Doc Brown Science,10001-1001,http://rjenks.github.io/Badger
+10002,1002,registration,Mal,Serenity Logistics,10001-1001,http://rjenks.github.io/Badger
+10003,1003,operations,Fry,Planet Express,10003-1003,http://rjenks.github.io/Badger
