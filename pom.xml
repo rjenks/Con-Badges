@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.universalbits.conorganizer</groupId>
 	<artifactId>badger</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<name>Badger</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -178,7 +178,7 @@
 							<jar>target/${artifactId}-${version}-shaded.jar</jar> <!-- 'shaded' is the value set on shadedClassifierName above -->
 							<errTitle>App Err</errTitle>
 							<classPath>
-								<mainClass>com.universalbits.conorganizer.badger.BadgePrinter</mainClass>
+								<mainClass>com.universalbits.conorganizer.badger.Badger</mainClass>
 							</classPath>
 							<icon>src/main/resources/icons/badger.ico</icon>
 							<jre>
