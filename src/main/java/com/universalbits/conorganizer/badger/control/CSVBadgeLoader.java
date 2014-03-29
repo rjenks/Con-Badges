@@ -44,22 +44,4 @@ public class CSVBadgeLoader implements Runnable {
 		}
 	}
 	
-	public static void main(String[] args) {
-		try {
-			FileInputStream in = new FileInputStream("C:/Users/rjenks/Desktop/WhoFestDFW-2013-Sample.txt");
-			BadgeQueue queue = new BadgeQueue() {
-
-				@Override
-				public void queueBadge(BadgeInfo badgeInfo) {
-					System.out.println(badgeInfo);
-				}
-				
-			};
-			CSVBadgeLoader loader = new CSVBadgeLoader(in, queue);
-			new Thread(loader).start();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-	}
-
 }
