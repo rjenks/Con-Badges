@@ -49,23 +49,29 @@ class StartPrintingAction extends AbstractAction {
 	
 	private void start() {
 		running = true;
-		firePropertyChange(Action.NAME, START_TEXT, STOP_TEXT);
-		final PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-        pras.add(new Copies(1));
-        
-        final PrintService[] services = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.PNG, pras);
         PrintService ps = null;
-        for (PrintService service : services) {
-            final String name = service.getName();
-            System.out.println(name);
-            if (name.startsWith("HiTi")) {
-            	ps = service;
-            }
-        }
-        if (ps == null) {
-        	System.err.println("Could not find printer");
-        	this.setEnabled(true);
-        	return;
+        
+        firePropertyChange(Action.NAME, START_TEXT, STOP_TEXT);
+        
+        if (badgePrinterUI.isPrintMode()) {
+			final PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+	        pras.add(new Copies(1));
+	        
+	        final PrintService[] services = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.PNG, pras);
+	
+	        for (PrintService service : services) {
+	            final String name = service.getName();
+	            System.out.println(name);
+	            // TODO need to 
+	            if (name.startsWith("HiTi")) {
+	            	ps = service;
+	            }
+	        }
+	        if (ps == null) {
+	        	System.err.println("Could not find printer");
+	        	this.setEnabled(true);
+	        	return;
+	        }
         }
         final PrintService printService = ps;
         
@@ -76,7 +82,7 @@ class StartPrintingAction extends AbstractAction {
 					badgePrinter.printBadges(badgeSource, printService);
 				} else {
 			        final File userHome = new File(System.getProperty("user.home"));
-			        final File outDir = new File(userHome, "badgeprinter");
+			        final File outDir = new File(userHome, "badger");
 			        outDir.mkdir();
 					badgePrinter.generateBadgePNGs(badgeSource, outDir);
 				}
