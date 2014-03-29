@@ -28,7 +28,7 @@ class LoadCSVAction extends AbstractAction {
 	
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		JFileChooser fc = new JFileChooser();
+		JFileChooser fc = new JFileChooser(new File("."));
 		FileFilter filter = new FileFilter() {
 
 			@Override
