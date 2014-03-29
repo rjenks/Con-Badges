@@ -16,7 +16,9 @@ public class BadgeInfo extends HashMap<String,String> {
 	public static final String ID_USER = "ID_USER";
 	public static final String BARCODE = "BARCODE";
 	public static final String QRCODE = "QRCODE";
+	public static final String PICTURE = "PICTURE";
 	public static final String DESCRIPTION = "DESCRIPTION";
+	public static final String TEMPLATE = "TEMPLATE";
 	
 	private String toString;
 	

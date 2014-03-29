@@ -37,13 +37,14 @@ import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
 
 import com.universalbits.conorganizer.badger.model.BadgeInfo;
 
 public class BadgePrinter {
     private static final Logger LOGGER = Logger.getLogger(BadgePrinter.class.getName());
-    private static final String PICTURE = "PICTURE";
 
     private long t = 0;
     private int widthInInches = 4;
@@ -72,6 +73,14 @@ public class BadgePrinter {
             }
         }
         return new File(badgeDataDir, name);
+    }
+    
+    private final File getBadgeImage(String name) {
+    	File image = getBadgeFile(name + ".png");
+    	if (!image.exists()) {
+    		image = getBadgeFile(name + ".jpg");
+    	}
+    	return image;
     }
 
     /**
@@ -223,15 +232,19 @@ public class BadgePrinter {
         String picBase64 = null;
         t("begin loading " + picFile);
         byte[] picData = toByteArray(picFile);
-        picBase64 = "data:image/png;base64," + Base64.encode(picData);
+        if (picFile.getName().endsWith(".png")) {
+        	picBase64 = "data:image/png;base64," + Base64.encode(picData);
+        } else if (picFile.getName().endsWith(".jpg")) {
+        	picBase64 = "data:image/jpeg;base64," + Base64.encode(picData);
+        }
         t("end loading " + picFile);
         return picBase64;
     }
 
-    private String getImage(final String type, final String userId) throws FileNotFoundException, IOException {
+    private String getImage(final String picture, final String userId) throws FileNotFoundException, IOException {
         String picBase64 = null;
         if (userId != null) {
-            File uniquePicFile = getBadgeFile(userId + ".png");
+            File uniquePicFile = getBadgeImage(userId);
             if (uniquePicFile.exists()) {
                 picBase64 = loadImage(uniquePicFile);
             } else {
@@ -240,13 +253,14 @@ public class BadgePrinter {
         }
         // if we didn't find a unique picture for this member
         if (picBase64 == null) {
-            final File picFile = getBadgeFile(type + ".png");
+            final File picFile = getBadgeImage(picture);
             picBase64 = loadImage(picFile);
         }
         return picBase64;
     }
 
-    private SVGDocument getSVGTemplate(final String template) throws IOException, URISyntaxException {
+    private SVGDocument getSVGTemplate(String template) throws IOException, URISyntaxException {
+    	template = template + ".svg";
         final String uri = getBadgeFile(template).toURI().toString();
         t("begin loading " + uri);
         final String parser = XMLResourceDescriptor.getXMLParserClassName();
@@ -258,9 +272,11 @@ public class BadgePrinter {
 
     private Properties getProperties(String type) throws IOException, InterruptedException {
         final File propsFileUTF8 = getBadgeFile(type + ".utf8.properties");
-        final Reader propsReader = new InputStreamReader(new FileInputStream(propsFileUTF8), "UTF-8");
         final Properties props = new Properties();
-        props.load(propsReader);
+        if (propsFileUTF8.exists() && propsFileUTF8.canRead()) {
+	        final Reader propsReader = new InputStreamReader(new FileInputStream(propsFileUTF8), "UTF-8");
+	        props.load(propsReader);
+        }
         return props;
     }
         
@@ -345,10 +361,17 @@ public class BadgePrinter {
                     TransformerException, TranscoderException {
     	Element e;
         final String type = badgeInfo.get(BadgeInfo.TYPE);
+        // add the type specific defaults as needed 
         final Properties props = getProperties(type);
-        final SVGDocument doc = getSVGTemplate(props.getProperty("template"));
+        for (Object key : props.keySet()) {
+        	final String stringKey = key.toString();
+        	//if the badge info doesn't contain this property, set it
+        	if (!badgeInfo.containsKey(stringKey)) {
+	        	badgeInfo.put(stringKey, props.getProperty(stringKey));
+        	}
+        }
+        final SVGDocument doc = getSVGTemplate(badgeInfo.get(BadgeInfo.TEMPLATE));
         t("parse");
-        
         for (String key : badgeInfo.keySet()) {
         	if (BadgeInfo.QRCODE.equals(key)) {
                 e = doc.getElementById(BadgeInfo.QRCODE);
@@ -371,17 +394,27 @@ public class BadgePrinter {
         	        e.setAttributeNS("http://www.w3.org/1999/xlink", "href", barcodeData);
         	        t("set barcode");
                 }
-        	} else if (PICTURE.equals(key)) {
-                e = doc.getElementById(PICTURE);
+        	} else if (BadgeInfo.PICTURE.equals(key)) {
+                e = doc.getElementById(BadgeInfo.PICTURE);
                 if (e != null) {
+                	String picture = badgeInfo.get(BadgeInfo.PICTURE);
                 	String userId = badgeInfo.get(BadgeInfo.ID_USER);
-        	        String picBase64 = getImage(type, userId);
+        	        String picBase64 = getImage(picture, userId);
         	        e.setAttributeNS("http://www.w3.org/1999/xlink", "href", picBase64);
         	        t("set pic");
                 }
         	} else {
                 e = doc.getElementById(key);
                 if (e != null) {
+                	// Inkscape often puts a tspan element inside the text element for formatting. We need to preserve it.
+                    final NodeList children = e.getChildNodes();
+                    if (children.getLength() > 0) {
+                    	Node eChild = children.item(0);
+                    	String nodeName = eChild.getNodeName();
+                    	if (eChild instanceof Element && nodeName.equals("tspan")) {
+                    		e = (Element)eChild;
+                    	}
+                    }
                 	e.setTextContent(badgeInfo.get(key));
                 }
         	}
