@@ -7,6 +7,8 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.universalbits.conorganizer.badger.control.BadgeStatusListener;
+
 public class BadgeInfo extends HashMap<String,String> {
 	private static final long serialVersionUID = 1L;
 	private static final String DEFAULT_TYPE = "BADGE";
@@ -21,6 +23,7 @@ public class BadgeInfo extends HashMap<String,String> {
 	public static final String TEMPLATE = "TEMPLATE";
 	
 	private String toString;
+	private Object context;
 	
 	public BadgeInfo() {
 		super();
@@ -37,6 +40,14 @@ public class BadgeInfo extends HashMap<String,String> {
 	
 	public BadgeInfo(Map<String,String> fields) {
 		super(fields);
+	}
+	
+	public void setContext(Object context) {
+		this.context = context;
+	}
+	
+	public Object getContext() {
+		return this.context;
 	}
 	
 	private String getJsonString(JSONObject json, String key) throws JSONException {

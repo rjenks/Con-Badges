@@ -35,6 +35,7 @@ public class BadgePrinterUI {
 	private BadgeListModel historyListModel;
 	private QuitAction quitAction;
 	private LoadCSVAction loadCSVAction;
+	private ServerConnectAction serverConnectAction;
 	private StartPrintingAction startPrintingAction;
 	private JToolBar toolBar;
 	private JToolBar statusBar;
@@ -73,6 +74,7 @@ public class BadgePrinterUI {
 			
 			startPrintingAction = new StartPrintingAction(BadgePrinterUI.this, uiBadgeSource);
 			loadCSVAction = new LoadCSVAction(frame, uiBadgeQueue);
+			serverConnectAction = new ServerConnectAction(frame, uiBadgeQueue);
 			quitAction = new QuitAction();
 
 			frame = new JFrame("Badge Printer");
@@ -106,6 +108,8 @@ public class BadgePrinterUI {
 			final JMenuBar menuBar = new JMenuBar();
 			final JMenu fileMenu = new JMenu("File");
 			fileMenu.add(loadCSVAction);
+			fileMenu.add(serverConnectAction);
+			fileMenu.addSeparator();
 			fileMenu.add(startPrintingAction);
 			fileMenu.addSeparator();
 			fileMenu.add(quitAction);

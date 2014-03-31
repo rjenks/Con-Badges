@@ -324,18 +324,25 @@ public class BadgePrinter {
     public void printBadges(BadgeSource badgeSource, PrintService printService) {
     	while (!stopped) {
     		BadgeInfo badgeInfo = badgeSource.getBadgeToPrint();
+    		String status = "ERROR - UNKNOWN";
     		if (badgeInfo == null) {
     			return;
     		}
     		try {
-	    		SVGDocument doc = generateBadge(badgeInfo);
-	    		BufferedImage image = generateImage(doc);
+	    		final SVGDocument doc = generateBadge(badgeInfo);
+	    		final BufferedImage image = generateImage(doc);
 	    		printBadge(image, printService);
 	    		badgeSource.reportDone(badgeInfo);
-	    		Thread.sleep(10000);
+	    		status = "OK";
     		} catch (Exception e) {
     			badgeSource.reportProblem(badgeInfo);
-    			e.printStackTrace();
+    			status = "ERROR - " + e.getMessage();
+    			LOGGER.log(Level.SEVERE, "Error while printing badge " + badgeInfo);
+    		} finally {
+	    		final Object context = badgeInfo.getContext();
+	    		if (context != null && context instanceof BadgeStatusListener) {
+	    			((BadgeStatusListener)context).notifyBadgeStatus(badgeInfo, status);
+	    		}
     		}
     	}
     }

@@ -179,7 +179,7 @@ public class APIClient {
         return url;
     }
     
-    public static final String getUrlAsString(final URL url) throws Exception {
+    public static final String getUrlAsString(final URL url) throws IOException {
         final URLConnection connection = url.openConnection();
         connection.setConnectTimeout(45000);
         connection.setReadTimeout(45000);
