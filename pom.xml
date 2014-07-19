@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.universalbits.conorganizer</groupId>
 	<artifactId>badger</artifactId>
-	<version>0.1.1</version>
-	<name>Badger</name>
+    <version>1.0.0</version>
+    <name>Badger</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
