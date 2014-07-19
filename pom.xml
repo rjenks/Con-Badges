@@ -210,11 +210,17 @@
                                 <fileVersion>
                                     ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${parsedVersion.buildNumber}
                                 </fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <txtFileVersion>
+                                    ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${parsedVersion.buildNumber}
+                                </txtFileVersion>
                                 <fileDescription>Event Badge Generator</fileDescription>
                                 <copyright>Copyright 2014 by Robert Jenks</copyright>
-                                <productVersion>${project.version}</productVersion>
-                                <txtProductVersion>${project.version}</txtProductVersion>
+                                <productVersion>
+                                    ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${parsedVersion.buildNumber}
+                                </productVersion>
+                                <txtProductVersion>
+                                    ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${parsedVersion.buildNumber}
+                                </txtProductVersion>
                                 <productName>Badger</productName>
                                 <internalName>Badger</internalName>
                                 <originalFilename>App.exe</originalFilename>
