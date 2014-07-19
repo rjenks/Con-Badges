@@ -1,19 +1,8 @@
 package com.universalbits.conorganizer.common;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -22,13 +11,6 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 public class APIClient {
     private static final Logger LOGGER = Logger.getLogger(APIClient.class.getName());
@@ -43,7 +25,7 @@ public class APIClient {
     public static final String PROPERTY_TOKEN = "token";
     public static final String PROPERTY_COUNTER = "counter";
     public static final String PROPERTY_KEY = "key";
-    public static final String PROPERTY_URLPREFIX = "urlPrefix";
+    public static final String PROPERTY_URL_PREFIX = "urlPrefix";
 
     public APIClient(String name) {
         this(name, null);
@@ -92,12 +74,12 @@ public class APIClient {
             }
         }
     }
-    
+
     public void setToken(String token) {
         prop.put(PROPERTY_TOKEN, token);
         save();
     }
-    
+
     public boolean hasToken() {
         String token = getProperty(PROPERTY_TOKEN);
         return token != null && !token.isEmpty();
@@ -110,8 +92,8 @@ public class APIClient {
     private static String getHostname() {
         String hostname = "localhost";
         try {
-            InetAddress addr = InetAddress.getLocalHost();
-            hostname = addr.getHostName();
+            InetAddress address = InetAddress.getLocalHost();
+            hostname = address.getHostName();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -123,7 +105,7 @@ public class APIClient {
     }
 
     public Map<String, String> getRequestParams() {
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         final String uuid = prop.getProperty(PROPERTY_UUID);
         final String token = prop.getProperty(PROPERTY_TOKEN);
         String counter = prop.getProperty(PROPERTY_COUNTER, "0");
@@ -132,14 +114,14 @@ public class APIClient {
         prop.setProperty(PROPERTY_COUNTER, counter);
         save();
         String key = "";
-        if (token != null & token.length() == 8) {
+        if (token != null && token.length() == 8) {
             try {
                 final String keyContent = uuid + "-" + token + "-" + counter;
                 // System.out.println("keyContent=" + keyContent);
                 byte[] hash = digest.digest((keyContent).getBytes("UTF-8"));
-                final StringBuffer hexString = new StringBuffer();
-                for (int i = 0; i < hash.length; i++) {
-                    String hex = Integer.toHexString(0xff & hash[i]);
+                final StringBuilder hexString = new StringBuilder();
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
                     if (hex.length() == 1) {
                         hexString.append('0');
                     }
@@ -157,10 +139,10 @@ public class APIClient {
     }
 
     public URL getRequestUrl(String service, Map<String, String> params) {
-        final HashMap<String, String> reqParams = new HashMap<String, String>();
+        final HashMap<String, String> reqParams = new HashMap<>();
         reqParams.putAll(params);
         reqParams.putAll(getRequestParams());
-        String urlPrefix = prop.getProperty(PROPERTY_URLPREFIX);
+        String urlPrefix = prop.getProperty(PROPERTY_URL_PREFIX);
         StringBuilder builder = new StringBuilder(512);
         builder.append(urlPrefix);
         builder.append(service);
@@ -178,7 +160,7 @@ public class APIClient {
                 builder.append(URLEncoder.encode(value, "ISO-8859-1"));
             }
         } catch (UnsupportedEncodingException e) {
-            LOGGER.log(Level.SEVERE, "error buiding url", e);
+            LOGGER.log(Level.SEVERE, "error building url", e);
         }
         URL url = null;
         try {
@@ -188,8 +170,8 @@ public class APIClient {
         }
         return url;
     }
-    
-    public static final String getUrlAsString(final URL url) throws IOException {
+
+    public static String getUrlAsString(final URL url) throws IOException {
         final URLConnection connection = url.openConnection();
         connection.setConnectTimeout(45000);
         connection.setReadTimeout(45000);
@@ -204,10 +186,10 @@ public class APIClient {
         in.close();
         return response.toString();
     }
-    
-    private static final void setupHTTPS() {
+
+    private static void setupHTTPS() {
         // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
             }
@@ -217,7 +199,7 @@ public class APIClient {
 
             public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
             }
-        } };
+        }};
 
         // Install the all-trusting trust manager
         try {
@@ -225,9 +207,9 @@ public class APIClient {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-
+            LOGGER.log(Level.INFO, "error installing trust manager", e);
         }
-        
+
         HostnameVerifier hv = new HostnameVerifier() {
             @Override
             public boolean verify(String urlHostName, SSLSession session) {
