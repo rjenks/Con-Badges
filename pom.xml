@@ -7,10 +7,12 @@
     <name>Badger</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--
         <parsedVersion.majorVersion/>
         <parsedVersion.minorVersion/>
         <parsedVersion.incrementalVersion/>
         <parsedVersion.buildNumber/>
+        -->
     </properties>
     <scm>
         <developerConnection>scm:git:ssh://github.com/rjenks/Badger.git</developerConnection>
@@ -256,6 +258,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <archive>
                         <manifest>
