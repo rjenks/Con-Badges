@@ -92,6 +92,16 @@ public class APIClient {
             }
         }
     }
+    
+    public void setToken(String token) {
+        prop.put(PROPERTY_TOKEN, token);
+        save();
+    }
+    
+    public boolean hasToken() {
+        String token = getProperty(PROPERTY_TOKEN);
+        return token != null && !token.isEmpty();
+    }
 
     public String getClientName() {
         return prop.getProperty(PROPERTY_NAME);

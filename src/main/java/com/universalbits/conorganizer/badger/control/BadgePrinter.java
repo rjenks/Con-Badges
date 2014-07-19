@@ -381,6 +381,7 @@ public class BadgePrinter {
         t("parse");
         for (String key : badgeInfo.keySet()) {
         	if (BadgeInfo.QRCODE.equals(key)) {
+        	    // TODO if image else if text
                 e = doc.getElementById(BadgeInfo.QRCODE);
                 final String qrCodeURL = badgeInfo.get(BadgeInfo.QRCODE);
                 if (e != null && qrCodeURL != null) {
@@ -391,9 +392,10 @@ public class BadgePrinter {
         	        t("set qrcode");
                 }
         	} else if (BadgeInfo.BARCODE.equals(key)) {
+        	    // TODO if image else if text
                 e = doc.getElementById(BadgeInfo.BARCODE);
-                if (e != null) {
-        	        final String barcodeValue = badgeInfo.get(BadgeInfo.BARCODE);
+                final String barcodeValue = badgeInfo.get(BadgeInfo.BARCODE);
+                if (e != null && barcodeValue != null) {
         	        final int barcodeWidth = Math.round(Float.parseFloat(e.getAttribute("width"))) * 7;
         	        final int barcodeHeight = Math.round(Float.parseFloat(e.getAttribute("height"))) * 7;
         	        final String barcodeData = "data:image/png;base64," + BarcodeGenerator.code128PNGBase64(barcodeValue, barcodeWidth, barcodeHeight);
