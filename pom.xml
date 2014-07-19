@@ -180,7 +180,7 @@
                         <configuration>
                             <headerType>gui</headerType>
                             <outfile>target/badger.exe</outfile>
-                            <jar>target/${artifactId}-${version}-shaded.jar</jar>
+                            <jar>target/${project.artifactId}-${project.version}-shaded.jar</jar>
                             <!-- 'shaded' is the value set on shadedClassifierName above -->
                             <errTitle>App Err</errTitle>
                             <classPath>
@@ -194,12 +194,12 @@
                                 <maxHeapSize>1024</maxHeapSize>
                             </jre>
                             <versionInfo>
-                                <fileVersion>${version}</fileVersion>
-                                <txtFileVersion>${version}</txtFileVersion>
+                                <fileVersion>${project.version}</fileVersion>
+                                <txtFileVersion>${project.version}</txtFileVersion>
                                 <fileDescription>Event Badge Generator</fileDescription>
-                                <copyright>Copyright 2013 by Robert Jenks</copyright>
-                                <productVersion>${version}</productVersion>
-                                <txtProductVersion>${version}</txtProductVersion>
+                                <copyright>Copyright 2014 by Robert Jenks</copyright>
+                                <productVersion>${project.version}</productVersion>
+                                <txtProductVersion>${project.version}</txtProductVersion>
                                 <productName>Badger</productName>
                                 <internalName>Badger</internalName>
                                 <originalFilename>App.exe</originalFilename>
