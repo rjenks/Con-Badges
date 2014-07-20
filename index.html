@@ -58,9 +58,9 @@
 10003,1003,operations,Fry,Planet Express,10003-1003,http://rjenks.github.io/Badger
 </code></pre>
 
-            <p>The first badge above for Rose has a TYPE of "attendee" which causes Badger to load a UTF8 encoded property file called "attendee.utf8.properties".</p>
+            <p>The first badge above for Rose has a TYPE of "attendee" which causes Badger to load a UTF8 encoded property file called "attendee.properties".</p>
 
-            attendee.utf8.properties
+            attendee.properties
 <pre><code>TEMPLATE=attendee
 PICTURE=mountain
 TYPE_LABEL=Attendee
@@ -113,7 +113,7 @@ TYPE_LABEL=Attendee
 
 <p>The TEMPLATE field specifies the name of the SVG template file without the .svg extension.  Instead of being directly specified as a badge field it can also be specified in a badge type properties file. (See below)</p>
 
-<p>The TYPE field specifies which SVG template to use.  For example if you specify TYPE=staff, the software will look for a file called “staff.utf8.properties” in the badgedata folder.  This file can contain any number of name=value lines which represent fields common to that type.  The fields in this file will be added to the fields from the badge data (CSV or web), but will not overwrite existing fields.  This file does not have to exist if all the fields you need are already in the badge data.  This file is assumed to be in UTF8 text format which means that it can contain international characters.</p>
+<p>The TYPE field specifies which SVG template to use.  For example if you specify TYPE=staff, the software will look for a file called “staff.properties” in the badgedata folder.  This file can contain any number of name=value lines which represent fields common to that type.  The fields in this file will be added to the fields from the badge data (CSV or web), but will not overwrite existing fields.  This file does not have to exist if all the fields you need are already in the badge data.  This file is assumed to be in UTF8 text format which means that it can contain international characters.</p>
 
 <p>ID_USER, ID_BADGE and DESCRIPTION are used by the GUI application to display what badge is being printed.</p>
             
