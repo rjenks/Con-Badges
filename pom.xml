@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.universalbits.conorganizer</groupId>
     <artifactId>badger</artifactId>
-    <version>1.0.0.1</version>
+    <version>1.0.0.2-SNAPSHOT</version>
     <name>Badger</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,7 +15,7 @@
     </properties>
     <scm>
         <developerConnection>scm:git:ssh://github.com/rjenks/Badger.git</developerConnection>
-        <tag>badger-1.0.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
     <dependencies>
         <dependency>
