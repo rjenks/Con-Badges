@@ -15,8 +15,8 @@
     </properties>
     <scm>
         <developerConnection>scm:git:ssh://github.com/rjenks/Badger.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -178,10 +178,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                    <!-- Make the shaded artifact not the main one -->
-                    <shadedClassifierName>shaded</shadedClassifierName>
-                    <!-- set the suffix to the shaded jar -->
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
                 </configuration>
             </plugin>
             <plugin>
@@ -199,8 +196,7 @@
                         <configuration>
                             <headerType>gui</headerType>
                             <outfile>target/badger.exe</outfile>
-                            <jar>target/${project.artifactId}-${project.version}-shaded.jar</jar>
-                            <!-- 'shaded' is the value set on shadedClassifierName above -->
+                            <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
                             <errTitle>App Err</errTitle>
                             <classPath>
                                 <mainClass>com.universalbits.conorganizer.badger.Badger</mainClass>
@@ -302,4 +298,11 @@
         <name>Universal Bits</name>
         <url>http://universalbits.com</url>
     </organization>
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
 </project>
