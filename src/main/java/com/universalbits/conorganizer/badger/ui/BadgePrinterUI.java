@@ -4,6 +4,8 @@ import com.universalbits.conorganizer.badger.model.BadgeInfo;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -119,14 +121,50 @@ public class BadgePrinterUI {
             frame.setJMenuBar(menuBar);
             contentPane.setLayout(new BorderLayout());
             tabbedPane.addTab("Pending", pendingScroll);
+            pendingListModel.addListDataListener(new TabTitleUpdateListener("Pending", 0, pendingListModel));
             tabbedPane.addTab("Problems", problemScroll);
+            problemListModel.addListDataListener(new TabTitleUpdateListener("Problems", 1, problemListModel));
             tabbedPane.addTab("History", historyScroll);
+            historyListModel.addListDataListener(new TabTitleUpdateListener("History", 2, historyListModel));
             contentPane.add(toolBar, BorderLayout.NORTH);
             contentPane.add(tabbedPane, BorderLayout.CENTER);
             contentPane.add(statusBar, BorderLayout.SOUTH);
             frame.setSize(600, 400);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+        }
+    }
+
+    private class TabTitleUpdateListener implements ListDataListener {
+        private final String title;
+        private final int index;
+        private final BadgeListModel listModel;
+
+        public TabTitleUpdateListener(String title, int index, BadgeListModel listModel) {
+            this.title = title;
+            this.index = index;
+            this.listModel = listModel;
+        }
+
+        @Override
+        public void intervalAdded(ListDataEvent e) {
+            update();
+        }
+
+        @Override
+        public void intervalRemoved(ListDataEvent e) {
+            update();
+        }
+
+        @Override
+        public void contentsChanged(ListDataEvent e) {
+            update();
+        }
+
+        private void update() {
+            final int size = listModel.size();
+            final String totalWithCount = size > 0 ? title + " (" + size + ")" : title;
+            tabbedPane.setTitleAt(index, totalWithCount);
         }
     }
 
