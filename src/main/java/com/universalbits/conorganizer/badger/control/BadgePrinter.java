@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 
 public class BadgePrinter {
     private static final Logger LOGGER = Logger.getLogger(BadgePrinter.class.getName());
+    public static final String XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
+    public static final String ATTRIBUTE_HREF = "href";
 
     private long t = 0;
     private int widthInInches = 4;
@@ -108,7 +110,7 @@ public class BadgePrinter {
     }
 
     private Properties getProperties(String type) throws IOException, InterruptedException {
-        final File propsFileUTF8 = getBadgeFile(type + ".utf8.properties");
+        final File propsFileUTF8 = getBadgeFile(type + ".properties");
         final Properties props = new Properties();
         if (propsFileUTF8.exists() && propsFileUTF8.canRead()) {
             final Reader propsReader = new InputStreamReader(new FileInputStream(propsFileUTF8), "UTF-8");
@@ -193,6 +195,7 @@ public class BadgePrinter {
             try {
                 SVGDocument doc = generateBadge(badgeInfo);
                 generatePNG(badgeInfo, doc, outDir);
+                badgeSource.reportDone(badgeInfo);
             } catch (Exception e) {
                 badgeSource.reportProblem(badgeInfo);
                 e.printStackTrace();
@@ -215,45 +218,50 @@ public class BadgePrinter {
         final SVGDocument doc = getSVGTemplate(badgeInfo.get(BadgeInfo.TEMPLATE));
         t("parse");
         for (String key : badgeInfo.keySet()) {
-            switch (key) {
-                case BadgeInfo.QRCODE:
-                    // TODO if image else if text
-                    e = doc.getElementById(BadgeInfo.QRCODE);
-                    final String qrCodeURL = badgeInfo.get(BadgeInfo.QRCODE);
-                    if (e != null && qrCodeURL != null) {
-                        final int qrCodeWidth = Math.round(Float.parseFloat(e.getAttribute("width"))) * 7;
-                        final String qrCodeData = "data:image/png;base64," + BarcodeGenerator.qrCodePNGBase64(qrCodeURL, qrCodeWidth);
-                        t("gen qrcode");
-                        e.setAttributeNS("http://www.w3.org/1999/xlink", "href", qrCodeData);
-                        t("set qrcode");
-                    }
-                    break;
-                case BadgeInfo.BARCODE:
-                    // TODO if image else if text
-                    e = doc.getElementById(BadgeInfo.BARCODE);
-                    final String barcodeValue = badgeInfo.get(BadgeInfo.BARCODE);
-                    if (e != null && barcodeValue != null) {
-                        final int barcodeWidth = Math.round(Float.parseFloat(e.getAttribute("width"))) * 7;
-                        final int barcodeHeight = Math.round(Float.parseFloat(e.getAttribute("height"))) * 7;
-                        final String barcodeData = "data:image/png;base64," + BarcodeGenerator.code128PNGBase64(barcodeValue, barcodeWidth, barcodeHeight);
-                        t("gen barcode");
-                        e.setAttributeNS("http://www.w3.org/1999/xlink", "href", barcodeData);
-                        t("set barcode");
-                    }
-                    break;
-                case BadgeInfo.PICTURE:
-                    e = doc.getElementById(BadgeInfo.PICTURE);
-                    if (e != null) {
-                        String picture = badgeInfo.get(BadgeInfo.PICTURE);
-                        String userId = badgeInfo.get(BadgeInfo.ID_USER);
-                        String picBase64 = getImage(picture, userId);
-                        e.setAttributeNS("http://www.w3.org/1999/xlink", "href", picBase64);
-                        t("set pic");
-                    }
-                    break;
-                default:
-                    e = doc.getElementById(key);
-                    if (e != null) {
+            for (int i = 0; i < 5; i++) {
+                final String numberedKey = (i > 0) ? key + "_" + i : key;
+                e = doc.getElementById(numberedKey);
+                if (e != null) {
+                    final String tag = e.getTagName();
+                    if ("image".equals(tag)) {
+                        switch (key) {
+                            case BadgeInfo.QRCODE:
+                                e = doc.getElementById(BadgeInfo.QRCODE);
+                                final String qrCodeURL = badgeInfo.get(BadgeInfo.QRCODE);
+                                if (e != null && qrCodeURL != null) {
+                                    final int qrCodeWidth = Math.round(Float.parseFloat(e.getAttribute("width"))) * 7;
+                                    final String qrCodeData = "data:image/png;base64," + BarcodeGenerator.qrCodePNGBase64(qrCodeURL, qrCodeWidth);
+                                    t("gen qrcode");
+                                    e.setAttributeNS(XLINK_NAMESPACE_URI, ATTRIBUTE_HREF, qrCodeData);
+                                    t("set qrcode");
+                                }
+                                break;
+                            case BadgeInfo.BARCODE:
+                                e = doc.getElementById(BadgeInfo.BARCODE);
+                                final String barcodeValue = badgeInfo.get(BadgeInfo.BARCODE);
+                                if (e != null && barcodeValue != null) {
+                                    if (e.getTagName().equals("image")) {
+                                        final int barcodeWidth = Math.round(Float.parseFloat(e.getAttribute("width"))) * 7;
+                                        final int barcodeHeight = Math.round(Float.parseFloat(e.getAttribute("height"))) * 7;
+                                        final String barcodeData = "data:image/png;base64," + BarcodeGenerator.code128PNGBase64(barcodeValue, barcodeWidth, barcodeHeight);
+                                        t("gen barcode");
+                                        e.setAttributeNS(XLINK_NAMESPACE_URI, ATTRIBUTE_HREF, barcodeData);
+                                        t("set barcode");
+                                    }
+                                }
+                                break;
+                            case BadgeInfo.PICTURE:
+                                e = doc.getElementById(BadgeInfo.PICTURE);
+                                if (e != null) {
+                                    final String picture = badgeInfo.get(BadgeInfo.PICTURE);
+                                    final String userId = badgeInfo.get(BadgeInfo.ID_USER);
+                                    final String picBase64 = getImage(picture, userId);
+                                    e.setAttributeNS(XLINK_NAMESPACE_URI, ATTRIBUTE_HREF, picBase64);
+                                    t("set pic");
+                                }
+                                break;
+                        }
+                    } else if ("text".equals(tag)) {
                         // Inkscape often puts a tspan element inside the text element for formatting. We need to preserve it.
                         final NodeList children = e.getChildNodes();
                         if (children.getLength() > 0) {
@@ -265,7 +273,7 @@ public class BadgePrinter {
                         }
                         e.setTextContent(badgeInfo.get(key));
                     }
-                    break;
+                }
             }
         }
         t("get elements");
