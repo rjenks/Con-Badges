@@ -203,8 +203,9 @@
                             </classPath>
                             <icon>src/main/resources/icons/badger.ico</icon>
                             <jre>
-                                <minVersion>1.7.0</minVersion>
-                                <maxVersion>1.7.9</maxVersion>
+                                <path>jre1.7.0_21-x64/bin/java.exe</path>
+                                <minVersion>1.7.0_00</minVersion>
+                                <maxVersion>1.7.0_21</maxVersion>
                                 <initialHeapSize>128</initialHeapSize>
                                 <maxHeapSize>1024</maxHeapSize>
                             </jre>
@@ -258,7 +259,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <addClasspath>true</addClasspath>
+                            <addClasspath>false</addClasspath>
                             <mainClass>com.universalbits.conorganizer.badger.Badger</mainClass>
                         </manifest>
                     </archive>

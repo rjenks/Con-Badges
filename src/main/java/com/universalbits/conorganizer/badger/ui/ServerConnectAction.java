@@ -1,5 +1,6 @@
 package com.universalbits.conorganizer.badger.ui;
 
+import com.universalbits.conorganizer.badger.control.BadgePrinter;
 import com.universalbits.conorganizer.badger.control.BadgeQueue;
 import com.universalbits.conorganizer.badger.control.ServerBadgeLoader;
 
@@ -25,6 +26,7 @@ public class ServerConnectAction extends AbstractAction {
     private synchronized void start() {
         running = true;
         loader = new ServerBadgeLoader(queue, new TokenRequiredListener());
+        frame.setTitle(BadgePrinter.APP_NAME + " - " + loader.getClientName());
         new Thread(loader).start();
         firePropertyChange(Action.NAME, STOP_TEXT, START_TEXT);
     }

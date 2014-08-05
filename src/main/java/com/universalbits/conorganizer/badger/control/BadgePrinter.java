@@ -29,15 +29,45 @@ public class BadgePrinter {
     private static final Logger LOGGER = Logger.getLogger(BadgePrinter.class.getName());
     public static final String XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
     public static final String ATTRIBUTE_HREF = "href";
+    public static final String APP_NAME = "Badger";
+
+    public static final String PROPERTY_PAGE_WIDTH = "page_width";
+    public static final String PROPERTY_PAGE_HEIGHT = "page_height";
+    public static final String PROPERTY_X_SCALE = "x_scale";
+    public static final String PROPERTY_X_TRANSLATE = "x_translate";
+    public static final String PROPERTY_Y_SCALE = "y_scale";
+    public static final String PROPERTY_Y_TRANSLATE = "y_translate";
 
     private long t = 0;
     private int widthInInches = 4;
     private int heightInInches = 6;
     private int dpi = 300;
     private boolean stopped = false;
+    private final Properties prop = new Properties();
 
     public BadgePrinter() {
+        final File propFile = new File(APP_NAME + ".properties");
+        try {
+            if (propFile.exists()) {
+                prop.load(new FileInputStream(propFile));
+                LOGGER.info("loading properties");
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
 
+    private double getPropertyDouble(final String name, final double defaultValue) {
+        double value = defaultValue;
+        final String valueString = prop.getProperty(name);
+        if (valueString != null) {
+            try {
+                value = Double.parseDouble(valueString);
+            } catch (NumberFormatException nfe) {
+                LOGGER.log(Level.WARNING, "Property " + name + " could not be converted to a floating point number value='" + valueString + "'");
+            }
+        }
+        return value;
     }
 
     private void t(String event) {
@@ -127,18 +157,18 @@ public class BadgePrinter {
             System.out.println("x=" + pf.getImageableX() + " y=" + pf.getImageableY());
             System.out.println("width=" + pf.getImageableWidth() + " height=" + pf.getImageableHeight());
             final Paper paper = new Paper();
-            // TODO - Read paper size from config
-            paper.setSize(4.1 * 72, 6.15 * 72);
+            double pageWidth = getPropertyDouble(PROPERTY_PAGE_WIDTH, 4.0);
+            double pageHeight = getPropertyDouble(PROPERTY_PAGE_HEIGHT, 6.0);
+            paper.setSize(pageWidth * 72, pageHeight * 72);
             paper.setImageableArea(0.0, 0.0, paper.getWidth(), paper.getHeight());
             pf.setPaper(paper);
             printJob.setPrintable(new Printable() {
                 public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
                     Graphics2D g2 = (Graphics2D) graphics;
-                    // TODO - Read from config
-                    final double xScale = 1.025;
-                    final double xTranslate = -16;
-                    final double yScale = 1.025;
-                    final double yTranslate = 8;
+                    final double xScale = getPropertyDouble(PROPERTY_X_SCALE, 1);//1.025;
+                    final double xTranslate = getPropertyDouble(PROPERTY_X_TRANSLATE, 0);//-16;
+                    final double yScale = getPropertyDouble(PROPERTY_Y_SCALE, 1);//1.025;
+                    final double yTranslate = getPropertyDouble(PROPERTY_Y_TRANSLATE, 0);//8;
                     final double widthScale = (pageFormat.getWidth() / image.getWidth()) * xScale;
                     final double heightScale = (pageFormat.getHeight() / image.getHeight()) * yScale;
                     final AffineTransform at = AffineTransform.getScaleInstance(widthScale, heightScale);
@@ -188,6 +218,7 @@ public class BadgePrinter {
 
     public void generateBadgePNGs(BadgeSource badgeSource, File outDir) {
         while (!stopped) {
+            String status = "ERROR - UNKNOWN";
             BadgeInfo badgeInfo = badgeSource.getBadgeToPrint();
             if (badgeInfo == null) {
                 return;
@@ -196,9 +227,15 @@ public class BadgePrinter {
                 SVGDocument doc = generateBadge(badgeInfo);
                 generatePNG(badgeInfo, doc, outDir);
                 badgeSource.reportDone(badgeInfo);
+                status = "OK";
             } catch (Exception e) {
                 badgeSource.reportProblem(badgeInfo);
-                e.printStackTrace();
+                status = "ERROR: " + e.getMessage();
+            } finally {
+                final Object context = badgeInfo.getContext();
+                if (context != null && context instanceof BadgeStatusListener) {
+                    ((BadgeStatusListener) context).notifyBadgeStatus(badgeInfo, status);
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.universalbits.conorganizer.badger.ui;
 
+import com.universalbits.conorganizer.badger.control.BadgePrinter;
 import com.universalbits.conorganizer.badger.model.BadgeInfo;
 
 import javax.swing.*;
@@ -61,12 +62,13 @@ public class BadgePrinterUI {
             final UIBadgeSource uiBadgeSource = new UIBadgeSource(pendingListModel, problemListModel, historyListModel);
             final UIBadgeQueue uiBadgeQueue = new UIBadgeQueue(pendingListModel);
 
+            frame = new JFrame(BadgePrinter.APP_NAME);
+
             startPrintingAction = new StartPrintingAction(BadgePrinterUI.this, uiBadgeSource);
             loadCSVAction = new LoadCSVAction(frame, uiBadgeQueue);
             serverConnectAction = new ServerConnectAction(frame, uiBadgeQueue);
             quitAction = new QuitAction();
 
-            frame = new JFrame("Badge Printer");
             frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             frame.addWindowListener(new WindowAdapter() {
                 @Override

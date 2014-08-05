@@ -21,7 +21,7 @@ public class ServerBadgeLoader implements Runnable {
     private static final int ERROR_DELAY = 2000;
     private static final String PRINT_STATUS = "___PRINT_STATUS";
 
-    private final APIClient client = new APIClient("BadgePrinter");
+    private final APIClient client = new APIClient(BadgePrinter.APP_NAME);
     private final BadgeQueue queue;
     private final TokenRequiredListener tokenRequiredListener;
     private boolean stopped = false;
@@ -31,6 +31,10 @@ public class ServerBadgeLoader implements Runnable {
         this.queue = queue;
         this.tokenRequiredListener = listener;
         new Thread(serverBadgeNotifier).start();
+    }
+
+    public String getClientName() {
+        return client.getClientName();
     }
 
     public void stop() {
@@ -109,7 +113,7 @@ public class ServerBadgeLoader implements Runnable {
 
         @Override
         public void run() {
-            while (!stopped && !queue.isEmpty()) {
+            while (!stopped) {
                 try {
                     final BadgeInfo badgeInfo = queue.take();
                     final String badgeId = badgeInfo.get(BadgeInfo.ID_BADGE);
