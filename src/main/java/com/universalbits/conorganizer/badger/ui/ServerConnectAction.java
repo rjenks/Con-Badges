@@ -3,6 +3,9 @@ package com.universalbits.conorganizer.badger.ui;
 import com.universalbits.conorganizer.badger.control.BadgePrinter;
 import com.universalbits.conorganizer.badger.control.BadgeQueue;
 import com.universalbits.conorganizer.badger.control.ServerBadgeLoader;
+import com.universalbits.conorganizer.common.APIClient;
+import com.universalbits.conorganizer.common.ISettings;
+import com.universalbits.conorganizer.common.Settings;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -16,17 +19,21 @@ public class ServerConnectAction extends AbstractAction {
     private boolean running = false;
     private ServerBadgeLoader loader;
     private String token;
+    private ISettings settings;
 
-    public ServerConnectAction(JFrame frame, BadgeQueue queue) {
+    public ServerConnectAction(JFrame frame, ISettings settings, BadgeQueue queue) {
         super("Connect to Server");
         this.frame = frame;
         this.queue = queue;
+        this.settings = settings;
+        loader = new ServerBadgeLoader(queue, new TokenRequiredListener());
     }
 
     private synchronized void start() {
         running = true;
-        loader = new ServerBadgeLoader(queue, new TokenRequiredListener());
-        frame.setTitle(BadgePrinter.APP_NAME + " - " + loader.getClientName());
+        final String appName = settings.getProperty(Settings.PROPERTY_APP_NAME);
+        final String clientName = settings.getProperty(APIClient.PROPERTY_NAME);
+        frame.setTitle(appName + " - " + clientName);
         new Thread(loader).start();
         firePropertyChange(Action.NAME, STOP_TEXT, START_TEXT);
     }
@@ -36,6 +43,10 @@ public class ServerConnectAction extends AbstractAction {
         loader.stop();
         loader = null;
         firePropertyChange(Action.NAME, START_TEXT, STOP_TEXT);
+    }
+
+    public ServerBadgeLoader getServerBadgeLoader() {
+        return loader;
     }
 
     @Override

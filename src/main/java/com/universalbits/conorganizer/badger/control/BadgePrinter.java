@@ -1,7 +1,10 @@
 package com.universalbits.conorganizer.badger.control;
 
 import com.universalbits.conorganizer.badger.model.BadgeInfo;
+import com.universalbits.conorganizer.common.ISettings;
+import org.apache.batik.bridge.*;
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -13,10 +16,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGLength;
+import org.w3c.dom.svg.SVGSVGElement;
 
 import javax.print.PrintService;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.*;
 import java.io.*;
@@ -25,49 +33,42 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ *
+ * Problems:
+ * - SVG Version problems.  Workaround: remove version attribute from svg tag.
+ * - Empty space in SVG is cut off.  Workaround: add viewbox attribute to svg tag.
+ */
 public class BadgePrinter {
     private static final Logger LOGGER = Logger.getLogger(BadgePrinter.class.getName());
     public static final String XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
     public static final String ATTRIBUTE_HREF = "href";
-    public static final String APP_NAME = "Badger";
+    public static final String BADGE_DATA_DIR = "badgedata";
 
-    public static final String PROPERTY_PAGE_WIDTH = "page_width";
-    public static final String PROPERTY_PAGE_HEIGHT = "page_height";
-    public static final String PROPERTY_X_SCALE = "x_scale";
-    public static final String PROPERTY_X_TRANSLATE = "x_translate";
-    public static final String PROPERTY_Y_SCALE = "y_scale";
-    public static final String PROPERTY_Y_TRANSLATE = "y_translate";
+    public static final String PROPERTY_FIELDS = "fields";
+    public static final String PROPERTY_PAGE_WIDTH = "pageWidth";
+    public static final String PROPERTY_PAGE_HEIGHT = "pageHeight";
+    public static final String PROPERTY_X_SCALE = "xScale";
+    public static final String PROPERTY_X_TRANSLATE = "xTranslate";
+    public static final String PROPERTY_Y_SCALE = "yScale";
+    public static final String PROPERTY_Y_TRANSLATE = "yTranslate";
+    public static final double DEFAULT_X_SCALE = 1;//0.975;
+    public static final double DEFAULT_X_TRANSLATE = 0;//12.0;
+    public static final double DEFAULT_Y_SCALE = 1;//0.975;
+    public static final double DEFAULT_Y_TRANSLATE = 0;//18.0;
+    public static final double DEFAULT_PAGE_WIDTH = 4.133;//4.1
+    public static final double DEFAULT_PAGE_HEIGHT = 6.147;//6.15
 
     private long t = 0;
     private int widthInInches = 4;
     private int heightInInches = 6;
     private int dpi = 300;
     private boolean stopped = false;
-    private final Properties prop = new Properties();
+    private ISettings settings;
 
-    public BadgePrinter() {
-        final File propFile = new File(APP_NAME + ".properties");
-        try {
-            if (propFile.exists()) {
-                prop.load(new FileInputStream(propFile));
-                LOGGER.info("loading properties");
-            }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-    }
-
-    private double getPropertyDouble(final String name, final double defaultValue) {
-        double value = defaultValue;
-        final String valueString = prop.getProperty(name);
-        if (valueString != null) {
-            try {
-                value = Double.parseDouble(valueString);
-            } catch (NumberFormatException nfe) {
-                LOGGER.log(Level.WARNING, "Property " + name + " could not be converted to a floating point number value='" + valueString + "'");
-            }
-        }
-        return value;
+    public BadgePrinter(ISettings settings) {
+        this.settings = settings;
     }
 
     private void t(String event) {
@@ -81,7 +82,7 @@ public class BadgePrinter {
 
     private File getBadgeFile(String name) {
         if (badgeDataDir == null) {
-            badgeDataDir = new File("badgedata");
+            badgeDataDir = new File(BADGE_DATA_DIR);
             if (!badgeDataDir.exists() || !badgeDataDir.isDirectory()) {
                 throw new RuntimeException("badgedata directory not found");
             }
@@ -157,18 +158,18 @@ public class BadgePrinter {
             System.out.println("x=" + pf.getImageableX() + " y=" + pf.getImageableY());
             System.out.println("width=" + pf.getImageableWidth() + " height=" + pf.getImageableHeight());
             final Paper paper = new Paper();
-            double pageWidth = getPropertyDouble(PROPERTY_PAGE_WIDTH, 4.0);
-            double pageHeight = getPropertyDouble(PROPERTY_PAGE_HEIGHT, 6.0);
+            double pageWidth = settings.getPropertyDouble(PROPERTY_PAGE_WIDTH, DEFAULT_PAGE_WIDTH);
+            double pageHeight = settings.getPropertyDouble(PROPERTY_PAGE_HEIGHT, DEFAULT_PAGE_HEIGHT);
             paper.setSize(pageWidth * 72, pageHeight * 72);
             paper.setImageableArea(0.0, 0.0, paper.getWidth(), paper.getHeight());
             pf.setPaper(paper);
             printJob.setPrintable(new Printable() {
                 public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
                     Graphics2D g2 = (Graphics2D) graphics;
-                    final double xScale = getPropertyDouble(PROPERTY_X_SCALE, 1);//1.025;
-                    final double xTranslate = getPropertyDouble(PROPERTY_X_TRANSLATE, 0);//-16;
-                    final double yScale = getPropertyDouble(PROPERTY_Y_SCALE, 1);//1.025;
-                    final double yTranslate = getPropertyDouble(PROPERTY_Y_TRANSLATE, 0);//8;
+                    final double xScale = settings.getPropertyDouble(PROPERTY_X_SCALE, DEFAULT_X_SCALE);
+                    final double xTranslate = settings.getPropertyDouble(PROPERTY_X_TRANSLATE, DEFAULT_X_TRANSLATE);
+                    final double yScale = settings.getPropertyDouble(PROPERTY_Y_SCALE, DEFAULT_Y_SCALE);
+                    final double yTranslate = settings.getPropertyDouble(PROPERTY_Y_TRANSLATE, DEFAULT_Y_TRANSLATE);
                     final double widthScale = (pageFormat.getWidth() / image.getWidth()) * xScale;
                     final double heightScale = (pageFormat.getHeight() / image.getHeight()) * yScale;
                     final AffineTransform at = AffineTransform.getScaleInstance(widthScale, heightScale);
@@ -204,9 +205,10 @@ public class BadgePrinter {
                 badgeSource.reportDone(badgeInfo);
                 status = "OK";
             } catch (Exception e) {
+                badgeInfo.put(BadgeInfo.ERROR, e.getMessage());
                 badgeSource.reportProblem(badgeInfo);
                 status = "ERROR - " + e.getMessage();
-                LOGGER.log(Level.SEVERE, "Error while printing badge " + badgeInfo);
+                LOGGER.log(Level.SEVERE, "Error while printing badge " + badgeInfo, e);
             } finally {
                 final Object context = badgeInfo.getContext();
                 if (context != null && context instanceof BadgeStatusListener) {
@@ -229,8 +231,10 @@ public class BadgePrinter {
                 badgeSource.reportDone(badgeInfo);
                 status = "OK";
             } catch (Exception e) {
+                badgeInfo.put(BadgeInfo.ERROR, e.getMessage());
                 badgeSource.reportProblem(badgeInfo);
                 status = "ERROR: " + e.getMessage();
+                LOGGER.log(Level.SEVERE, "Error while printing badge " + badgeInfo, e);
             } finally {
                 final Object context = badgeInfo.getContext();
                 if (context != null && context instanceof BadgeStatusListener) {
@@ -240,7 +244,7 @@ public class BadgePrinter {
         }
     }
 
-    private SVGDocument generateBadge(BadgeInfo badgeInfo) throws Exception {
+    public SVGDocument generateBadge(BadgeInfo badgeInfo) throws Exception {
         Element e;
         final String type = badgeInfo.get(BadgeInfo.TYPE);
         // add the type specific defaults as needed 
@@ -326,6 +330,20 @@ public class BadgePrinter {
         return doc;
     }
 
+    private static Point2D.Double getScaledSize(double currentWidth, double currentHeight, double maxWidth, double maxHeight) {
+        double ratioX =  maxWidth / currentWidth;
+        double ratioY = maxHeight / currentHeight;
+        double newWidth;
+        double newHeight;
+        if (ratioX > ratioY){
+            newWidth = currentWidth * ratioY;
+            newHeight = currentHeight * ratioY;
+        } else {
+            newWidth = currentWidth * ratioX;
+            newHeight = currentHeight * ratioX;
+        }
+        return new Point2D.Double(newWidth, newHeight);
+    }
 
     private File generatePNG(BadgeInfo badgeInfo, SVGDocument doc, File outDir) throws TranscoderException, IOException {
         final String userId = badgeInfo.get(BadgeInfo.ID_USER);
@@ -342,12 +360,25 @@ public class BadgePrinter {
             fileName = System.currentTimeMillis() + "-" + type + ".png";
         }
         PNGTranscoder t = new PNGTranscoder();
-        t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float) widthInInches * dpi);
-        t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float) heightInInches * dpi);
+        UserAgent userAgent = new UserAgentAdapter();
+        DocumentLoader loader = new DocumentLoader(userAgent);
+        BridgeContext ctx = new BridgeContext(userAgent, loader);
+        ctx.setDynamicState(BridgeContext.DYNAMIC);
+        GVTBuilder builder = new GVTBuilder();
+        GraphicsNode rootGN = builder.build(ctx, doc);
+        Rectangle2D bounds = rootGN.getBounds();
+
+        double pageWidth = settings.getPropertyDouble(PROPERTY_PAGE_WIDTH, DEFAULT_PAGE_WIDTH);
+        double pageHeight = settings.getPropertyDouble(PROPERTY_PAGE_HEIGHT, DEFAULT_PAGE_HEIGHT);
+        Point2D.Double scaledSize = getScaledSize(bounds.getWidth(), bounds.getHeight(), pageWidth * dpi, pageHeight * dpi);
+
+        t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float)scaledSize.getX());
+        t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float)scaledSize.getY());
         t.addTranscodingHint(PNGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 25.4f / 300.0f);
         // Set the transcoder input and output.
         TranscoderInput input = new TranscoderInput(doc);
         File outFile = new File(outDir, fileName);
+        LOGGER.info("Saving badge as " + outFile.getAbsolutePath());
         OutputStream outStream = new FileOutputStream(outFile);
         TranscoderOutput output = new TranscoderOutput(outStream);
         // Perform the transcoding.
@@ -360,8 +391,12 @@ public class BadgePrinter {
 
     private BufferedImage generateImage(SVGDocument doc) throws IOException, TranscoderException {
         BufferedImageTranscoder t = new BufferedImageTranscoder();
-        t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float) widthInInches * dpi);
-        t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float) heightInInches * dpi);
+        SVGLength svgWidth = doc.getRootElement().getWidth().getBaseVal();
+        svgWidth.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_IN);
+        SVGLength svgHeight = doc.getRootElement().getHeight().getBaseVal();
+        svgHeight.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_IN);
+        t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, svgWidth.getValue() * dpi);
+        t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, svgHeight.getValue() * dpi);
         t.addTranscodingHint(PNGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 25.4f / 300.0f);
 
         TranscoderInput input = new TranscoderInput(doc);

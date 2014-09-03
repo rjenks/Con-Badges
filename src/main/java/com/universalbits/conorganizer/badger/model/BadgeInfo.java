@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BadgeInfo extends HashMap<String, String> {
+public class BadgeInfo extends HashMap<String, String> implements Comparable<BadgeInfo> {
     private static final long serialVersionUID = 1L;
     private static final String DEFAULT_TYPE = "BADGE";
 
@@ -19,6 +19,7 @@ public class BadgeInfo extends HashMap<String, String> {
     public static final String PICTURE = "PICTURE";
     public static final String DESCRIPTION = "DESCRIPTION";
     public static final String TEMPLATE = "TEMPLATE";
+    public static final String ERROR = "__ERROR";
 
     private String toString;
     private Object context;
@@ -98,10 +99,33 @@ public class BadgeInfo extends HashMap<String, String> {
                 if (userId != null || badgeId != null) {
                     b.append(" ");
                 }
+                final String error = get(ERROR);
+                if (error != null) {
+                    b.append(" (ERROR:");
+                    b.append(error);
+                    b.append(")");
+                }
                 toString = b.toString();
             }
         }
         return toString;
     }
 
+    @Override
+    public int compareTo(BadgeInfo o) {
+        final String type = get(TYPE);
+        final String oType = o.get(TYPE);
+        final String badgeId = get(ID_BADGE);
+        final String oBadgeId = o.get(ID_BADGE);
+        int result = type.compareTo(oType);
+        if (result == 0) {
+            result = badgeId.compareTo(oBadgeId);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof BadgeInfo) ? compareTo((BadgeInfo)o) == 0 : false;
+    }
 }

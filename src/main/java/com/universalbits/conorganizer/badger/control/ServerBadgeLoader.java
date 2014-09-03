@@ -2,6 +2,7 @@ package com.universalbits.conorganizer.badger.control;
 
 import com.universalbits.conorganizer.badger.model.BadgeInfo;
 import com.universalbits.conorganizer.common.APIClient;
+import com.universalbits.conorganizer.common.Settings;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,7 +22,7 @@ public class ServerBadgeLoader implements Runnable {
     private static final int ERROR_DELAY = 2000;
     private static final String PRINT_STATUS = "___PRINT_STATUS";
 
-    private final APIClient client = new APIClient(BadgePrinter.APP_NAME);
+    private final APIClient client = new APIClient(Settings.getInstance());
     private final BadgeQueue queue;
     private final TokenRequiredListener tokenRequiredListener;
     private boolean stopped = false;
@@ -33,8 +34,8 @@ public class ServerBadgeLoader implements Runnable {
         new Thread(serverBadgeNotifier).start();
     }
 
-    public String getClientName() {
-        return client.getClientName();
+    public APIClient getAPIClient() {
+        return client;
     }
 
     public void stop() {

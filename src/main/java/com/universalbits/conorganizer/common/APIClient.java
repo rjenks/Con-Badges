@@ -15,9 +15,7 @@ import java.util.logging.Logger;
 public class APIClient {
     private static final Logger LOGGER = Logger.getLogger(APIClient.class.getName());
 
-    private final String name;
-    private Properties prop;
-    private File propFile;
+    private ISettings settings;
     private MessageDigest digest;
 
     public static final String PROPERTY_NAME = "name";
@@ -27,37 +25,21 @@ public class APIClient {
     public static final String PROPERTY_KEY = "key";
     public static final String PROPERTY_URL_PREFIX = "urlPrefix";
 
-    public APIClient(String name) {
-        this(name, null);
-    }
-
-    public APIClient(String name, Properties prop) {
+    public APIClient(ISettings settings) {
+        this.settings = settings;
         APIClient.setupHTTPS();
-        this.name = name;
-        if (prop != null) {
-            this.prop = prop;
-        } else {
-            this.prop = prop = new Properties();
-            final File homeDir = new File(System.getProperty("user.home"));
-            propFile = new File(homeDir, name + ".properties");
-            try {
-                if (propFile.exists()) {
-                    prop.load(new FileInputStream(propFile));
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
+        if (settings == null) {
+            throw new IllegalStateException("Settings cannot be null");
         }
-        String uuid = prop.getProperty(PROPERTY_UUID, "");
+        String uuid = settings.getProperty(PROPERTY_UUID, "");
         if (uuid.length() != 32) {
             uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            prop.setProperty(PROPERTY_UUID, uuid);
+            settings.setProperty(PROPERTY_UUID, uuid);
         }
-        final String clientName = prop.getProperty(PROPERTY_NAME, getHostname());
-        prop.setProperty(PROPERTY_NAME, clientName);
-        final String token = prop.getProperty(PROPERTY_TOKEN, "");
-        prop.setProperty(PROPERTY_TOKEN, token);
-        save();
+        final String clientName = settings.getProperty(PROPERTY_NAME, getHostname());
+        settings.setProperty(PROPERTY_NAME, clientName);
+        final String token = settings.getProperty(PROPERTY_TOKEN, "");
+        settings.setProperty(PROPERTY_TOKEN, token);
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
@@ -65,19 +47,12 @@ public class APIClient {
         }
     }
 
-    private void save() {
-        if (propFile != null) {
-            try {
-                prop.store(new FileOutputStream(propFile), "settings for " + name);
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
+    public void setToken(String token) {
+        setProperty(PROPERTY_TOKEN, token);
     }
 
-    public void setToken(String token) {
-        prop.put(PROPERTY_TOKEN, token);
-        save();
+    public String getToken() {
+        return getProperty(PROPERTY_TOKEN);
     }
 
     public boolean hasToken() {
@@ -85,8 +60,20 @@ public class APIClient {
         return token != null && !token.isEmpty();
     }
 
+    public void setURLPrefix(final String urlPrefix) {
+        setProperty(PROPERTY_URL_PREFIX, urlPrefix);
+    }
+
+    public String getURLPrefix() {
+        return getProperty(PROPERTY_URL_PREFIX);
+    }
+
     public String getClientName() {
-        return prop.getProperty(PROPERTY_NAME);
+        return getProperty(PROPERTY_NAME);
+    }
+
+    public void setClientName(final String name) {
+        setProperty(PROPERTY_NAME, name);
     }
 
     private static String getHostname() {
@@ -101,18 +88,21 @@ public class APIClient {
     }
 
     public String getProperty(String name) {
-        return prop.getProperty(name);
+        return settings.getProperty(name);
+    }
+
+    public void setProperty(final String name, final String value) {
+        settings.setProperty(name, value);
     }
 
     public Map<String, String> getRequestParams() {
         final Map<String, String> params = new HashMap<>();
-        final String uuid = prop.getProperty(PROPERTY_UUID);
-        final String token = prop.getProperty(PROPERTY_TOKEN);
-        String counter = prop.getProperty(PROPERTY_COUNTER, "0");
+        final String uuid = settings.getProperty(PROPERTY_UUID);
+        final String token = settings.getProperty(PROPERTY_TOKEN);
+        String counter = settings.getProperty(PROPERTY_COUNTER, "0");
         // System.out.println("counter=" + counter);
         counter = (Integer.parseInt(counter) + 1) + "";
-        prop.setProperty(PROPERTY_COUNTER, counter);
-        save();
+        settings.setProperty(PROPERTY_COUNTER, counter);
         String key = "";
         if (token != null && token.length() == 8) {
             try {
@@ -142,7 +132,7 @@ public class APIClient {
         final HashMap<String, String> reqParams = new HashMap<>();
         reqParams.putAll(params);
         reqParams.putAll(getRequestParams());
-        String urlPrefix = prop.getProperty(PROPERTY_URL_PREFIX);
+        String urlPrefix = settings.getProperty(PROPERTY_URL_PREFIX);
         StringBuilder builder = new StringBuilder(512);
         builder.append(urlPrefix);
         builder.append(service);

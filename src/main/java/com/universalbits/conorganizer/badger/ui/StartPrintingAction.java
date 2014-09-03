@@ -75,7 +75,7 @@ class StartPrintingAction extends AbstractAction {
 
         new Thread() {
             public void run() {
-                badgePrinter = new BadgePrinter();
+                badgePrinter = badgePrinterUI.getBadgePrinter();
                 if (badgePrinterUI.isPrintMode()) {
                     badgePrinter.printBadges(badgeSource, printService);
                 } else {
