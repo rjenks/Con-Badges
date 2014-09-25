@@ -57,6 +57,14 @@ public class BadgeInfo extends HashMap<String, String> implements Comparable<Bad
         return value;
     }
 
+    public JSONObject toJsonObject() {
+        JSONObject json = new JSONObject();
+        for (String key : keySet()) {
+            json.put(key, get(key));
+        }
+        return json;
+    }
+
     @Override
     public String get(Object key) {
         String value = super.get(key);
