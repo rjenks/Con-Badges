@@ -12,6 +12,7 @@ import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.json.JSONObject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.awt.print.*;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -155,31 +157,38 @@ public class BadgePrinter {
             final PrinterJob printJob = PrinterJob.getPrinterJob();
             printJob.setPrintService(ps);
             final PageFormat pf = printJob.defaultPage();
-            System.out.println("x=" + pf.getImageableX() + " y=" + pf.getImageableY());
-            System.out.println("width=" + pf.getImageableWidth() + " height=" + pf.getImageableHeight());
+
             final Paper paper = new Paper();
-            double pageWidth = settings.getPropertyDouble(PROPERTY_PAGE_WIDTH, DEFAULT_PAGE_WIDTH);
-            double pageHeight = settings.getPropertyDouble(PROPERTY_PAGE_HEIGHT, DEFAULT_PAGE_HEIGHT);
-            paper.setSize(pageWidth * 72, pageHeight * 72);
+            double pageWidth = settings.getPropertyDouble(PROPERTY_PAGE_WIDTH, DEFAULT_PAGE_WIDTH) * 72;
+            double pageHeight = settings.getPropertyDouble(PROPERTY_PAGE_HEIGHT, DEFAULT_PAGE_HEIGHT) * 72;
+            System.out.println("Setting paper size to " + pageWidth + "x" + pageHeight);
+            paper.setSize(pageWidth, pageHeight);
             paper.setImageableArea(0.0, 0.0, paper.getWidth(), paper.getHeight());
             pf.setPaper(paper);
+
+            System.out.println("Buffered Image is " + image.getWidth() + "x" + image.getHeight());
+            System.out.println("Printer Page width=" + pf.getWidth() + " height=" + pf.getHeight());
+            System.out.println("Printer Page Imageable x=" + pf.getImageableX() + " y=" + pf.getImageableY()
+                    + " width=" + pf.getImageableWidth() + " height=" + pf.getImageableHeight());
             printJob.setPrintable(new Printable() {
-                public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-                    Graphics2D g2 = (Graphics2D) graphics;
-                    final double xScale = settings.getPropertyDouble(PROPERTY_X_SCALE, DEFAULT_X_SCALE);
-                    final double xTranslate = settings.getPropertyDouble(PROPERTY_X_TRANSLATE, DEFAULT_X_TRANSLATE);
-                    final double yScale = settings.getPropertyDouble(PROPERTY_Y_SCALE, DEFAULT_Y_SCALE);
-                    final double yTranslate = settings.getPropertyDouble(PROPERTY_Y_TRANSLATE, DEFAULT_Y_TRANSLATE);
-                    final double widthScale = (pageFormat.getWidth() / image.getWidth()) * xScale;
-                    final double heightScale = (pageFormat.getHeight() / image.getHeight()) * yScale;
-                    final AffineTransform at = AffineTransform.getScaleInstance(widthScale, heightScale);
-                    at.translate(xTranslate, yTranslate);
-                    if (pageIndex != 0) {
-                        return NO_SUCH_PAGE;
-                    }
-                    g2.drawRenderedImage(image, at);
-                    return PAGE_EXISTS;
+            public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+                Graphics2D g2 = (Graphics2D) graphics;
+                final double xScale = settings.getPropertyDouble(PROPERTY_X_SCALE, DEFAULT_X_SCALE);
+                final double xTranslate = settings.getPropertyDouble(PROPERTY_X_TRANSLATE, DEFAULT_X_TRANSLATE);
+                final double yScale = settings.getPropertyDouble(PROPERTY_Y_SCALE, DEFAULT_Y_SCALE);
+                final double yTranslate = settings.getPropertyDouble(PROPERTY_Y_TRANSLATE, DEFAULT_Y_TRANSLATE);
+                final double widthScale = (pageFormat.getWidth() / image.getWidth()) * xScale;
+                final double heightScale = (pageFormat.getHeight() / image.getHeight()) * yScale;
+                System.out.println("Setting scale to " + widthScale + "x" + heightScale);
+                final AffineTransform at = AffineTransform.getScaleInstance(widthScale, heightScale);
+                System.out.println("Setting translate to " + xTranslate + "x" + yTranslate);
+                at.translate(xTranslate, yTranslate);
+                if (pageIndex != 0) {
+                    return NO_SUCH_PAGE;
                 }
+                g2.drawRenderedImage(image, at);
+                return PAGE_EXISTS;
+            }
             }, pf);
             printJob.print();
         } catch (Exception e) {
@@ -191,7 +200,7 @@ public class BadgePrinter {
         this.stopped = true;
     }
 
-    public void printBadges(BadgeSource badgeSource, PrintService printService) {
+    public void printBadges(BadgeSource badgeSource, PrintService printService, File outDir) {
         while (!stopped) {
             BadgeInfo badgeInfo = badgeSource.getBadgeToPrint();
             String status = "ERROR - UNKNOWN";
@@ -202,6 +211,7 @@ public class BadgePrinter {
                 final SVGDocument doc = generateBadge(badgeInfo);
                 final BufferedImage image = generateImage(doc);
                 printBadge(image, printService);
+                saveBadgeInfo(badgeInfo, outDir);
                 badgeSource.reportDone(badgeInfo);
                 status = "OK";
             } catch (Exception e) {
@@ -228,6 +238,7 @@ public class BadgePrinter {
             try {
                 SVGDocument doc = generateBadge(badgeInfo);
                 generatePNG(badgeInfo, doc, outDir);
+                saveBadgeInfo(badgeInfo, outDir);
                 badgeSource.reportDone(badgeInfo);
                 status = "OK";
             } catch (Exception e) {
@@ -345,21 +356,7 @@ public class BadgePrinter {
         return new Point2D.Double(newWidth, newHeight);
     }
 
-    private File generatePNG(BadgeInfo badgeInfo, SVGDocument doc, File outDir) throws TranscoderException, IOException {
-        final String userId = badgeInfo.get(BadgeInfo.ID_USER);
-        final String badgeId = badgeInfo.get(BadgeInfo.ID_BADGE);
-        final String type = badgeInfo.get(BadgeInfo.TYPE);
-        String fileName;
-        if (userId != null && badgeId != null) {
-            fileName = userId + "-" + badgeId + "-" + type + ".png";
-        } else if (badgeId != null) {
-            fileName = badgeId + "-" + type + ".png";
-        } else if (userId != null) {
-            fileName = userId + "-" + type + ".png";
-        } else {
-            fileName = System.currentTimeMillis() + "-" + type + ".png";
-        }
-        PNGTranscoder t = new PNGTranscoder();
+    private void setupTranscoder(ImageTranscoder t, SVGDocument doc) throws TranscoderException {
         UserAgent userAgent = new UserAgentAdapter();
         DocumentLoader loader = new DocumentLoader(userAgent);
         BridgeContext ctx = new BridgeContext(userAgent, loader);
@@ -368,13 +365,52 @@ public class BadgePrinter {
         GraphicsNode rootGN = builder.build(ctx, doc);
         Rectangle2D bounds = rootGN.getBounds();
 
-        double pageWidth = settings.getPropertyDouble(PROPERTY_PAGE_WIDTH, DEFAULT_PAGE_WIDTH);
-        double pageHeight = settings.getPropertyDouble(PROPERTY_PAGE_HEIGHT, DEFAULT_PAGE_HEIGHT);
-        Point2D.Double scaledSize = getScaledSize(bounds.getWidth(), bounds.getHeight(), pageWidth * dpi, pageHeight * dpi);
+        double pageWidth = settings.getPropertyDouble(PROPERTY_PAGE_WIDTH, DEFAULT_PAGE_WIDTH) * dpi;
+        double pageHeight = settings.getPropertyDouble(PROPERTY_PAGE_HEIGHT, DEFAULT_PAGE_HEIGHT) * dpi;
+        Point2D.Double scaledSize = getScaledSize(bounds.getWidth(), bounds.getHeight(), pageWidth, pageHeight);
+        System.out.println("Target size = " + pageWidth + "x" + pageHeight);
+        System.out.println("Scaled size = " + scaledSize.getX() + "x" + scaledSize.getY());
 
-        t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float)scaledSize.getX());
+        t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float) scaledSize.getX());
         t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float)scaledSize.getY());
         t.addTranscodingHint(PNGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 25.4f / 300.0f);
+    }
+
+    private String getBadgeFilename(BadgeInfo badgeInfo, String ext) {
+        String fileName = "";
+        final String userId = badgeInfo.get(BadgeInfo.ID_USER);
+        final String badgeId = badgeInfo.get(BadgeInfo.ID_BADGE);
+        final String type = badgeInfo.get(BadgeInfo.TYPE);
+        if (userId != null && badgeId != null) {
+            fileName = userId + "-" + badgeId + "-" + type + ext;
+        } else if (badgeId != null) {
+            fileName = badgeId + "-" + type + ext;
+        } else if (userId != null) {
+            fileName = userId + "-" + type + ext;
+        } else {
+            fileName = System.currentTimeMillis() + "-" + type + ext;
+        }
+        return fileName;
+    }
+
+    private void saveBadgeInfo(BadgeInfo badgeInfo, File outDir) {
+        String fileName = getBadgeFilename(badgeInfo, ".json");
+        File file = new File(outDir, fileName);
+        JSONObject json = badgeInfo.toJsonObject();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            byte[] jsonBytes = json.toString().getBytes(Charset.forName("UTF-8"));
+            out.write(jsonBytes);
+            out.close();
+        } catch (IOException ioe) {
+            LOGGER.log(Level.SEVERE, "Error saving json", ioe);
+        }
+    }
+
+    private File generatePNG(BadgeInfo badgeInfo, SVGDocument doc, File outDir) throws TranscoderException, IOException {
+        String fileName = getBadgeFilename(badgeInfo, ".png");
+        PNGTranscoder t = new PNGTranscoder();
+        setupTranscoder(t, doc);
         // Set the transcoder input and output.
         TranscoderInput input = new TranscoderInput(doc);
         File outFile = new File(outDir, fileName);
@@ -391,17 +427,9 @@ public class BadgePrinter {
 
     private BufferedImage generateImage(SVGDocument doc) throws IOException, TranscoderException {
         BufferedImageTranscoder t = new BufferedImageTranscoder();
-        SVGLength svgWidth = doc.getRootElement().getWidth().getBaseVal();
-        svgWidth.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_IN);
-        SVGLength svgHeight = doc.getRootElement().getHeight().getBaseVal();
-        svgHeight.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_IN);
-        t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, svgWidth.getValue() * dpi);
-        t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, svgHeight.getValue() * dpi);
-        t.addTranscodingHint(PNGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 25.4f / 300.0f);
-
+        setupTranscoder(t, doc);
         TranscoderInput input = new TranscoderInput(doc);
         t.transcode(input, null);
-
         BufferedImage image = t.getBufferedImage();
         t("generate image");
         return image;
