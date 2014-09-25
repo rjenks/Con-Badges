@@ -6,6 +6,10 @@ import com.universalbits.conorganizer.badger.ui.BadgeListModel;
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +41,6 @@ public class BadgeTypeMonitor {
     private void loadTypes() throws IOException {
         DirectoryStream<Path> dirStream = Files.newDirectoryStream(badgeDataPath);
         for (Path file : dirStream) {
-            //System.out.println(file.getFileName());
             if (isPropertyFile(file)) {
                 String type = getTypeFromFile(file);
                 addType(type);
@@ -46,10 +49,17 @@ public class BadgeTypeMonitor {
     }
 
     private void addType(String type) {
+        int i;
         LOGGER.info("adding type " + type);
         final BadgeInfo badgeInfo = new BadgeInfo();
         badgeInfo.put(BadgeInfo.TYPE, type);
-        typesList.addElement(badgeInfo);
+        for (i = 0; i < typesList.size(); i++) {
+            String oType = typesList.get(i).get(BadgeInfo.TYPE);
+            if (oType.compareTo(type) > 0) {
+                break;
+            }
+        }
+        typesList.add(i, badgeInfo);
     }
 
     private void removeType(String type) {

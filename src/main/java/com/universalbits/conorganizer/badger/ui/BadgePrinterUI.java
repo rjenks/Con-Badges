@@ -17,11 +17,15 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.util.Enumeration;
+import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +48,7 @@ public class BadgePrinterUI {
     private LoadCSVAction loadCSVAction;
     private ServerConnectAction serverConnectAction;
     private StartPrintingAction startPrintingAction;
+    private NewBadgeAction newBadgeAction;
     private JToolBar toolBar;
     private JToolBar statusBar;
     private JLabel statusText;
@@ -51,6 +56,7 @@ public class BadgePrinterUI {
     private JRadioButtonMenuItem pngOption;
     private BadgePrinter badgePrinter;
     private ISettings settings;
+    private UIBadgeQueue uiBadgeQueue;
 
     public BadgePrinterUI() {
         Settings.init(APP_NAME);
@@ -64,6 +70,10 @@ public class BadgePrinterUI {
 
     public boolean isPrintMode() {
         return printOption.isSelected();
+    }
+
+    public UIBadgeQueue getBadgeQueue() {
+        return uiBadgeQueue;
     }
 
     private class InitRunner implements Runnable {
@@ -86,11 +96,12 @@ public class BadgePrinterUI {
             problemListModel = new BadgeListModel();
             historyListModel = new BadgeListModel();
             final UIBadgeSource uiBadgeSource = new UIBadgeSource(pendingListModel, problemListModel, historyListModel);
-            final UIBadgeQueue uiBadgeQueue = new UIBadgeQueue(pendingListModel);
+            uiBadgeQueue = new UIBadgeQueue(pendingListModel);
 
             frame = new JFrame(APP_NAME);
             frame.setMinimumSize(new Dimension(600,300));
 
+            newBadgeAction = new NewBadgeAction(BadgePrinterUI.this);
             settingsAction = new SettingsAction(BadgePrinterUI.this, settings);
             startPrintingAction = new StartPrintingAction(BadgePrinterUI.this, uiBadgeSource);
             loadCSVAction = new LoadCSVAction(frame, uiBadgeQueue);
@@ -132,6 +143,7 @@ public class BadgePrinterUI {
             final JScrollPane historyScroll = new JScrollPane(historyList);
             final JMenuBar menuBar = new JMenuBar();
             final JMenu fileMenu = new JMenu("File");
+            fileMenu.add(newBadgeAction);
             fileMenu.add(loadCSVAction);
             fileMenu.add(serverConnectAction);
             fileMenu.addSeparator();
@@ -192,6 +204,16 @@ public class BadgePrinterUI {
 
     public BadgePrinter getBadgePrinter() {
         return badgePrinter;
+    }
+
+    public String[] getTypes() {
+        final List<String> types = new ArrayList<String>();
+        final Enumeration<BadgeInfo> e = typesListModel.elements();
+        while (e.hasMoreElements()) {
+            final BadgeInfo badgeInfo = e.nextElement();
+            types.add(badgeInfo.get(BadgeInfo.TYPE));
+        }
+       return types.toArray(new String[types.size()]);
     }
 
     private class TabTitleUpdateListener implements ListDataListener {

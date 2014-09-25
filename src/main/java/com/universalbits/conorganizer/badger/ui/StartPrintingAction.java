@@ -76,11 +76,11 @@ class StartPrintingAction extends AbstractAction {
         new Thread() {
             public void run() {
                 badgePrinter = badgePrinterUI.getBadgePrinter();
+                final File userHome = new File(System.getProperty("user.home"));
+                final File outDir = new File(userHome, "badger");
                 if (badgePrinterUI.isPrintMode()) {
-                    badgePrinter.printBadges(badgeSource, printService);
+                    badgePrinter.printBadges(badgeSource, printService, outDir);
                 } else {
-                    final File userHome = new File(System.getProperty("user.home"));
-                    final File outDir = new File(userHome, "badger");
                     if (outDir.isDirectory() || outDir.mkdirs()) {
                         badgePrinter.generateBadgePNGs(badgeSource, outDir);
                     } else {
