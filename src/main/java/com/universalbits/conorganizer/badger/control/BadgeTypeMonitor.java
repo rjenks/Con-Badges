@@ -4,6 +4,7 @@ import com.universalbits.conorganizer.badger.model.BadgeInfo;
 import com.universalbits.conorganizer.badger.ui.BadgeListModel;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.logging.Level;
@@ -25,7 +26,11 @@ public class BadgeTypeMonitor {
             final FileSystem defaultFileSystem = FileSystems.getDefault();
             watcher = defaultFileSystem.newWatchService();
             badgeDataPath = Paths.get(BadgePrinter.BADGE_DATA_DIR);
-            System.out.println("badgedata path = " + badgeDataPath.toFile().getAbsolutePath());
+            File badgeDataFile = badgeDataPath.toFile();
+            LOGGER.fine("badgedata path = " + badgeDataFile.getAbsolutePath());
+            if (!badgeDataFile.exists()) {
+                badgeDataFile.mkdirs();
+            }
             watchKey = badgeDataPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
             loadTypes();
             new Thread(new MonitorRunnable()).start();
