@@ -12,3 +12,8 @@
 
 # Eclipse Files #
 /.settings
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.next
+.idea/workspace.xml
+.idea/libraries
