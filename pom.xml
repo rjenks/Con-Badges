@@ -15,7 +15,7 @@
     </properties>
     <scm>
         <developerConnection>scm:git:ssh://github.com/rjenks/Badger.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>badger-1.0.0.3</tag>
     </scm>
     <dependencies>
         <dependency>
@@ -203,7 +203,7 @@
                             </classPath>
                             <icon>src/main/resources/icons/badger.ico</icon>
                             <jre>
-                                <path>jre1.7.0_21-x64/bin/java.exe</path>
+                                <path>jre1.7.0_21-x64</path>
                                 <minVersion>1.7.0_00</minVersion>
                                 <maxVersion>1.7.0_21</maxVersion>
                                 <initialHeapSize>128</initialHeapSize>
