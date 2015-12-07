@@ -13,15 +13,15 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Badger by rjenks</title>
+    <title>Con-Badges by rjenks</title>
   </head>
 
   <body>
     <header>
       <div class="inner">
-        <h1>Badger</h1>
+        <h1>Con-Badges</h1>
         <h2>Application for creating unique event badges for attendees using SVG templates</h2>
-        <a href="https://github.com/rjenks/Badger" class="button"><small>View project on</small>GitHub</a>
+        <a href="https://github.com/rjenks/Con-Badges" class="button"><small>View project on</small>GitHub</a>
       </div>
     </header>
 
@@ -29,7 +29,7 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h1>
-            <a name="badger" class="anchor" href="#badger"><span class="octicon octicon-link"></span></a>Badger</h1>
+            <a name="con-badges" class="anchor" href="#con-badges"><span class="octicon octicon-link"></span></a>Con-Badges</h1>
 
             <p>Application for creating unique event badges for attendees using SVG templates.  Many events use a variety of badges for different attendee types and access levels.  This software allows you to generate personalized badges of a variety of types.  Badges can be printed from attendee data loaded from a CSV file or by polling a web service you provide.  The badges are defined by types.  Each type can have a separate SVG template file to define it's appearance.  The SVG is dynamically modified based on the loaded badge data.  For example the SVG template might include a text element named "FIRST_NAME" which is replaced with the person's first name.  In addition, the software can generate a QR Code and a Barcode based on user data which can be positioned in the SVG template.</p>
 
@@ -42,7 +42,7 @@
 
             <p>The software will look for a folder called "badgedata" in the current directory.  It expects to find the definition of badge types, SVG templates and necessary pictures here.</p>
             
-            <p>There are two modes of operation. From the Options menu you can select "Print Badges" or "Generate PNG Files". "Print Badges" instructs the software to generate badge images in memory and send them directly to a printer. "Generate PNG Files" instructs the software to generate PNG images for each badge and store them in the "badger" folder inside your home directory.</p>
+            <p>There are two modes of operation. From the Options menu you can select "Print Badges" or "Generate PNG Files". "Print Badges" instructs the software to generate badge images in memory and send them directly to a printer. "Generate PNG Files" instructs the software to generate PNG images for each badge and store them in the "con-badges" folder inside your home directory.</p>
             
             <p>When the software starts up, it is initially stopped.  You can use the "Start Processing" menu option to begin generating badges.  Processing can be stopped at any time and can be restarted.  This is useful if your printer runs out of paper and you want to pause printing until you have added paper.</p>
             
@@ -52,13 +52,13 @@
 
             badges.csv
 <pre><code>ID_USER,ID_BADGE,TYPE,BADGE_NAME,ORGANIZATION,BARCODE,QRCODE
-10000,1000,attendee,Rose,Bad Wolf Club,10000-1000,http://rjenks.github.io/Badger
-10001,1001,pre-registered,Marty,Doc Brown Science,10001-1001,http://rjenks.github.io/Badger
-10002,1002,registration,Mal,Serenity Logistics,10001-1001,http://rjenks.github.io/Badger
-10003,1003,operations,Fry,Planet Express,10003-1003,http://rjenks.github.io/Badger
+10000,1000,attendee,Rose,Bad Wolf Club,10000-1000,http://rjenks.github.io/Con-Badges
+10001,1001,pre-registered,Marty,Doc Brown Science,10001-1001,http://rjenks.github.io/Con-Badges
+10002,1002,registration,Mal,Serenity Logistics,10001-1001,http://rjenks.github.io/Con-Badges
+10003,1003,operations,Fry,Planet Express,10003-1003,http://rjenks.github.io/Con-Badges
 </code></pre>
 
-            <p>The first badge above for Rose has a TYPE of "attendee" which causes Badger to load a UTF8 encoded property file called "attendee.properties".</p>
+            <p>The first badge above for Rose has a TYPE of "attendee" which causes Con-Badges to load a UTF8 encoded property file called "attendee.properties".</p>
 
             attendee.properties
 <pre><code>TEMPLATE=attendee
@@ -66,7 +66,7 @@ PICTURE=mountain
 TYPE_LABEL=Attendee
 </code></pre>
 
-            <p>This specifies that it should use the TEMPLATE called "attendee" which causes Badger to load <b>attendee.svg</b>.  It then combines the fields read from both the CSV and the properties file and uses those properties to do replacements in the SVG file, generate a PNG and possibly print the badge.</p>
+            <p>This specifies that it should use the TEMPLATE called "attendee" which causes Con-Badges to load <b>attendee.svg</b>.  It then combines the fields read from both the CSV and the properties file and uses those properties to do replacements in the SVG file, generate a PNG and possibly print the badge.</p>
 
 
             
@@ -121,44 +121,44 @@ TYPE_LABEL=Attendee
         <h2>
         <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>SVG Templates and Inkscape</h2>
       
-      <p>Inkscape is an open source vector graphic program.  It allows you to edit Scalable Vector Graphic (SVG) files.  SVG files are not images although you can use them in similar ways.  Raster images (PNG, JPG, BMP, etc...) are a series of pixels each having a color. Vector graphics are a collection of drawing operations. Instead of a series of pixel representing a circle, a vector graphic would contain instructions for drawing a circle of a specified radius with line and file colors.  Vector graphics are especially useful when you need to scale a graphic to numerous sizes.  Badge printers are often 300dpi, therefore to print a 4"x6" badge a full resolution you will need a 1200x1800 pixel raster image.  Also because vector formats describe a graphic it means that Badger can change the description before generating a raster image from it.  For example it can replace text or images you have placed and formatted in the graphic.</p>
+      <p>Inkscape is an open source vector graphic program.  It allows you to edit Scalable Vector Graphic (SVG) files.  SVG files are not images although you can use them in similar ways.  Raster images (PNG, JPG, BMP, etc...) are a series of pixels each having a color. Vector graphics are a collection of drawing operations. Instead of a series of pixel representing a circle, a vector graphic would contain instructions for drawing a circle of a specified radius with line and file colors.  Vector graphics are especially useful when you need to scale a graphic to numerous sizes.  Badge printers are often 300dpi, therefore to print a 4"x6" badge a full resolution you will need a 1200x1800 pixel raster image.  Also because vector formats describe a graphic it means that Con-Badges can change the description before generating a raster image from it.  For example it can replace text or images you have placed and formatted in the graphic.</p>
 
-      <p>In Inkscape when you are adding a text or image that should be replaced with Badger you will need to edit the "Object Properties".  In the dialog, change the "Id" and click the "Set" button.  If you close the dialog without clicking the "Set" button the change won't be saved.</p>
+      <p>In Inkscape when you are adding a text or image that should be replaced with Con-Badges you will need to edit the "Object Properties".  In the dialog, change the "Id" and click the "Set" button.  If you close the dialog without clicking the "Set" button the change won't be saved.</p>
       
       <img src="images/InkscapeObjectProperties.png"><br>
 
         <h2>
         <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Fetching Badges from a Web Server</h2>
       
-      <p>Badger has the capability of fetching badges from a server.  (This capability is disconnected at the moment, but should be resolved soon. I recently changed the application from a simple command line tool to having a user interface.  In this processes I haven't finished adding the server connection back in.  The code is all there if you're in a hurry.)</p>
+      <p>Con-Badges has the capability of fetching badges from a server.  (This capability is disconnected at the moment, but should be resolved soon. I recently changed the application from a simple command line tool to having a user interface.  In this processes I haven't finished adding the server connection back in.  The code is all there if you're in a hurry.)</p>
       
       <p>The application uses a HTTPS and token/key system to securely fetch badges.  It uses a shared secret in the form of a per-client token which is never sent over the Internet. The system also includes a sequence number which should prevent replay attacks.</p>
       
-      <p>At startup Badger will generate a unique Client ID and send this to the server.  If the server has never seen this client it should generate and a new Token and keep a list of Client ID and their associated Tokens. The web server's administrator should then manually retrieve the token and put it in the Badger configuration file.</p>
+      <p>At startup Con-Badges will generate a unique Client ID and send this to the server.  If the server has never seen this client it should generate and a new Token and keep a list of Client ID and their associated Tokens. The web server's administrator should then manually retrieve the token and put it in the Con-Badges configuration file.</p>
       
-      <p>Other than the initial handshake, every request from Badger to the server will include an MD5 hash of the "CLIENTID-SEQUENCENUM-TOKEN" (The raw token is NEVER sent!).  The server will have the same information and can generate and compare a locally generated MD5 hash with the hash received from Badger.</p>
+      <p>Other than the initial handshake, every request from Con-Badges to the server will include an MD5 hash of the "CLIENTID-SEQUENCENUM-TOKEN" (The raw token is NEVER sent!).  The server will have the same information and can generate and compare a locally generated MD5 hash with the hash received from Con-Badges.</p>
             
         </section>
 
         <aside id="sidebar">
-            <a href="https://github.com/rjenks/Badger/releases/latest" class="button">
+            <a href="https://github.com/rjenks/Con-Badges/releases/latest" class="button">
                 <small>Download</small>
                 latest version
             </a>
 
-            https://github.com/rjenks/Badger/releases/latest
+            https://github.com/rjenks/Con-Badges/releases/latest
 <!--
-          <a href="https://github.com/rjenks/Badger/zipball/master" class="button">
+          <a href="https://github.com/rjenks/Con-Badges/zipball/master" class="button">
             <small>Download</small>
             .zip file
           </a>
-          <a href="https://github.com/rjenks/Badger/tarball/master" class="button">
+          <a href="https://github.com/rjenks/Con-Badges/tarball/master" class="button">
             <small>Download</small>
             .tar.gz file
           </a>
 -->
 
-          <p class="repo-owner"><a href="https://github.com/rjenks/Badger"></a> is maintained by <a href="https://github.com/rjenks">rjenks</a>.</p>
+          <p class="repo-owner"><a href="https://github.com/rjenks/Con-Badges"></a> is maintained by <a href="https://github.com/rjenks">rjenks</a>.</p>
 
           <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
