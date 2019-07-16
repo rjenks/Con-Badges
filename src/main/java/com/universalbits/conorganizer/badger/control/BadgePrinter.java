@@ -1,9 +1,39 @@
 package com.universalbits.conorganizer.badger.control;
 
-import com.universalbits.conorganizer.badger.model.BadgeInfo;
-import com.universalbits.conorganizer.common.ISettings;
-import org.apache.batik.bridge.*;
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.print.PrintService;
+
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DocumentLoader;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgent;
+import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -11,29 +41,14 @@ import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.json.JSONObject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGLength;
-import org.w3c.dom.svg.SVGSVGElement;
 
-import javax.print.PrintService;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.print.*;
-import java.io.*;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.universalbits.conorganizer.badger.model.BadgeInfo;
+import com.universalbits.conorganizer.common.ISettings;
 
 /**
  *
@@ -63,8 +78,8 @@ public class BadgePrinter {
     public static final double DEFAULT_PAGE_HEIGHT = 6.147;//6.15
 
     private long t = 0;
-    private int widthInInches = 4;
-    private int heightInInches = 6;
+//    private int widthInInches = 4;
+//    private int heightInInches = 6;
     private int dpi = 300;
     private boolean stopped = false;
     private ISettings settings;
@@ -101,13 +116,14 @@ public class BadgePrinter {
     }
 
     private String loadImage(File picFile) throws IOException {
+    	final Base64.Encoder base64Encoder = Base64.getEncoder();
         String picBase64 = null;
         t("begin loading " + picFile);
         byte[] picData = toByteArray(picFile);
         if (picFile.getName().endsWith(".png")) {
-            picBase64 = "data:image/png;base64," + Base64.encode(picData);
+            picBase64 = "data:image/png;base64," + base64Encoder.encodeToString(picData);
         } else if (picFile.getName().endsWith(".jpg")) {
-            picBase64 = "data:image/jpeg;base64," + Base64.encode(picData);
+            picBase64 = "data:image/jpeg;base64," + base64Encoder.encodeToString(picData);
         }
         t("end loading " + picFile);
         return picBase64;
@@ -302,7 +318,7 @@ public class BadgePrinter {
                                     }
                                 }
                                 break;
-                            case BadgeInfo.PICTURE:
+                            default:
                                 e = doc.getElementById(BadgeInfo.PICTURE);
                                 if (e != null) {
                                     final String picture = badgeInfo.get(BadgeInfo.PICTURE);

@@ -1,18 +1,24 @@
 package com.universalbits.conorganizer.badger.control;
 
-import com.universalbits.conorganizer.badger.model.BadgeInfo;
-import com.universalbits.conorganizer.badger.ui.BadgeListModel;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
+
+import com.universalbits.conorganizer.badger.model.BadgeInfo;
+import com.universalbits.conorganizer.badger.ui.BadgeListModel;
 
 /**
  * Created by rjenks on 8/31/2014.
@@ -22,7 +28,7 @@ public class BadgeTypeMonitor {
     private BadgeListModel typesList;
     private Path badgeDataPath;
     private WatchService watcher;
-    private WatchKey watchKey;
+//    private WatchKey watchKey;
 
     public BadgeTypeMonitor(BadgeListModel typesList) {
         this.typesList = typesList;
@@ -35,7 +41,8 @@ public class BadgeTypeMonitor {
             if (!badgeDataFile.exists()) {
                 badgeDataFile.mkdirs();
             }
-            watchKey = badgeDataPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
+//            watchKey = 
+    		badgeDataPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
             loadTypes();
             new Thread(new MonitorRunnable()).start();
         } catch (IOException ioe) {
@@ -103,7 +110,8 @@ public class BadgeTypeMonitor {
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         continue;
                     }
-                    WatchEvent<Path> ev = (WatchEvent<Path>)event;
+                    @SuppressWarnings("unchecked")
+					WatchEvent<Path> ev = (WatchEvent<Path>)event;
                     Path filename = ev.context();
                     final Path child = badgeDataPath.resolve(filename);
 

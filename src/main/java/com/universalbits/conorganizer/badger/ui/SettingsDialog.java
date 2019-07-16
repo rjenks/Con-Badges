@@ -1,37 +1,46 @@
 package com.universalbits.conorganizer.badger.ui;
 
-import com.universalbits.conorganizer.badger.control.BadgePrinter;
-import com.universalbits.conorganizer.badger.control.ServerBadgeLoader;
-import com.universalbits.conorganizer.common.APIClient;
-import com.universalbits.conorganizer.common.ISettings;
-import com.universalbits.conorganizer.common.Settings;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
+
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+
+import com.universalbits.conorganizer.badger.control.BadgePrinter;
+import com.universalbits.conorganizer.common.APIClient;
+import com.universalbits.conorganizer.common.ISettings;
 
 /**
  * Created by rjenks on 9/1/2014.
  */
 public class SettingsDialog extends JDialog {
-
+	private static final long serialVersionUID = 1L;
     private JFrame frame;
-    private BadgePrinterUI badgePrinterUI;
-    private ISettings settings;
+//    private BadgePrinterUI badgePrinterUI;
+//    private ISettings settings;
 
-    private static final String WEST = SpringLayout.WEST;
-    private static final String EAST = SpringLayout.EAST;
-    private static final String NORTH = SpringLayout.NORTH;
-    private static final String SOUTH = SpringLayout.SOUTH;
+//    private static final String WEST = SpringLayout.WEST;
+//    private static final String EAST = SpringLayout.EAST;
+//    private static final String NORTH = SpringLayout.NORTH;
+//    private static final String SOUTH = SpringLayout.SOUTH;
     private static final int GAP = 5;
     private static final int COLS = 2;
 
     public SettingsDialog(final BadgePrinterUI badgePrinterUI, final ISettings settings) {
         super(badgePrinterUI.getJFrame(), "Settings", true);
         this.frame = badgePrinterUI.getJFrame();
-        this.badgePrinterUI = badgePrinterUI;
-        this.settings = settings;
+//        this.badgePrinterUI = badgePrinterUI;
+//        this.settings = settings;
 
         JPanel contentPane = (JPanel)this.getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -102,7 +111,9 @@ public class SettingsDialog extends JDialog {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         JButton okButton = new JButton(new AbstractAction("OK") {
-            @Override
+			private static final long serialVersionUID = 1L;
+
+			@Override
             public void actionPerformed(ActionEvent e) {
                 settings.setProperty(APIClient.PROPERTY_NAME, clientNameField.getText());
                 settings.setProperty(APIClient.PROPERTY_URL_PREFIX, hostField.getText());
@@ -119,6 +130,7 @@ public class SettingsDialog extends JDialog {
             }
         });
         JButton cancelButton = new JButton(new AbstractAction("Cancel") {
+        	private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);

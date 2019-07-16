@@ -7,6 +7,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class Toast extends JDialog {
+	private static final long serialVersionUID = 1L;
 
     int delay;
     public Toast(String message, int delay) {

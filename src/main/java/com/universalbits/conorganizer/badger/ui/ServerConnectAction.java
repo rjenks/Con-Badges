@@ -1,14 +1,18 @@
 package com.universalbits.conorganizer.badger.ui;
 
-import com.universalbits.conorganizer.badger.control.BadgePrinter;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import com.universalbits.conorganizer.badger.control.BadgeQueue;
 import com.universalbits.conorganizer.badger.control.ServerBadgeLoader;
 import com.universalbits.conorganizer.common.APIClient;
 import com.universalbits.conorganizer.common.ISettings;
 import com.universalbits.conorganizer.common.Settings;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class ServerConnectAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
@@ -26,7 +30,7 @@ public class ServerConnectAction extends AbstractAction {
         this.frame = frame;
         this.queue = queue;
         this.settings = settings;
-        loader = new ServerBadgeLoader(queue, new TokenRequiredListener());
+        loader = new ServerBadgeLoader(this.queue, new TokenRequiredListener());
     }
 
     private synchronized void start() {

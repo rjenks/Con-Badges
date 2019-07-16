@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
  * Created by rjenks on 9/1/2014.
  */
 public class SettingsAction extends AbstractAction {
+	private static final long serialVersionUID = 1L;
     private BadgePrinterUI badgePrinterUI;
     private ISettings settings;
 

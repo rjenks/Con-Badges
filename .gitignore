@@ -1,5 +1,7 @@
 *.class
 
+/badgedata
+
 # Package Files #
 *.jar
 *.war

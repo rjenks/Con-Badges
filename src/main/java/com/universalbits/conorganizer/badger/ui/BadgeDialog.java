@@ -48,11 +48,13 @@ public class BadgeDialog extends JDialog {
             this.valueField = valueField;
         }
 
-        public JComponent getKeyField() {
+        @SuppressWarnings("unused")
+		public JComponent getKeyField() {
             return keyField;
         }
 
-        public JComponent getValueField() {
+        @SuppressWarnings("unused")
+		public JComponent getValueField() {
             return valueField;
         }
     }

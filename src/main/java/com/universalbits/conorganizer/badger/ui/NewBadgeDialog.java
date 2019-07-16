@@ -1,14 +1,8 @@
 package com.universalbits.conorganizer.badger.ui;
 
-import com.universalbits.conorganizer.badger.control.BadgePrinter;
-import com.universalbits.conorganizer.badger.model.BadgeInfo;
-import com.universalbits.conorganizer.common.APIClient;
-import com.universalbits.conorganizer.common.ISettings;
-import com.universalbits.conorganizer.common.Settings;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,9 +10,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+
+import com.universalbits.conorganizer.badger.control.BadgePrinter;
+import com.universalbits.conorganizer.badger.model.BadgeInfo;
+import com.universalbits.conorganizer.common.ISettings;
+import com.universalbits.conorganizer.common.Settings;
 
 public class NewBadgeDialog extends JDialog {
-
+	private static final Logger LOGGER = Logger.getLogger(NewBadgeDialog.class.getSimpleName());
     private static final long serialVersionUID = 1L;
     private static final int EMPTY_BORDER_SIZE = 4;
     private static final String SETTING_NEXT_BADGE_ID = "NEXT_BADGE_ID";
@@ -62,7 +74,9 @@ public class NewBadgeDialog extends JDialog {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         JButton okButton = new JButton(new AbstractAction("Print") {
-            @Override
+			private static final long serialVersionUID = 1L;
+
+			@Override
             public void actionPerformed(ActionEvent e) {
                 final BadgeInfo badgeInfo = new BadgeInfo();
                 String nextBadgeId = "1";
@@ -85,6 +99,7 @@ public class NewBadgeDialog extends JDialog {
         });
         getRootPane().setDefaultButton(okButton);
         JButton cancelButton = new JButton(new AbstractAction("Close") {
+        	private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -119,6 +134,7 @@ public class NewBadgeDialog extends JDialog {
             this.name = name;
             this.labelField = labelField;
             this.valueField = valueField;
+        	LOGGER.finest("labelField:" + this.labelField + " valueField:" + this.valueField);
         }
 
         public String getName() {
@@ -131,14 +147,15 @@ public class NewBadgeDialog extends JDialog {
                 JTextField textField = (JTextField) valueField;
                 value = textField.getText();
             } else if (valueField instanceof JComboBox) {
-                JComboBox<String> comboBox = (JComboBox<String>)valueField;
+                @SuppressWarnings("unchecked")
+				JComboBox<String> comboBox = (JComboBox<String>)valueField;
                 value = "" + comboBox.getSelectedItem();
             }
             return value;
         }
 
         public void reset() {
-            if (BadgeInfo.ID_BADGE.equals(name)) {
+            if (BadgeInfo.ID_BADGE.equals(getName())) {
                 JTextField valueTextField = (JTextField)valueField;
                 try {
                     valueTextField.setText("" + (Integer.parseInt(getValue()) + 1));
